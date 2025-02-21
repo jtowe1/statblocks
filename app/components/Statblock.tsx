@@ -4,8 +4,8 @@ import Image from 'next/image';
 interface CreatureStats {
   name: string;
   meta: string;
-  "Armor Class": string;
-  "Hit Points": string;
+  ArmorClass: string;
+  HitPoints: string;
   Speed: string;
   STR: string;
   STR_mod: string;
@@ -51,8 +51,8 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
       {/* Stats Section */}
       <div className="py-4">
         <div className="text-amber-900">
-          <p><span className="font-bold">Armor Class</span> {props["Armor Class"]}</p>
-          <p><span className="font-bold">Hit Points</span> {props["Hit Points"]}</p>
+          <p><span className="font-bold">Armor Class</span> {props.ArmorClass}</p>
+          <p><span className="font-bold">Hit Points</span> {props.HitPoints}</p>
           <p><span className="font-bold">Speed</span> {props.Speed}</p>
         </div>
       </div>
