@@ -28,8 +28,6 @@ export interface Monster {
 }
 
 export async function getMonsters(): Promise<Monster[]> {
-  await initDb();
-
   const db = await openDb();
   try {
     const result = await db.execute(`

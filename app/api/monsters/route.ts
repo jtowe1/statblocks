@@ -8,8 +8,6 @@ interface MySQLError extends Error {
 
 export async function POST(request: Request) {
   try {
-    await initDb();
-
     const monster = await request.json() as Monster;
     const db = await openDb();
 

@@ -8,6 +8,10 @@ export default async function seedDatabase() {
     // Clear existing data
     await db.execute('DELETE FROM monsters');
 
+    // Create database if it doesn't exist
+    await db.execute('CREATE DATABASE IF NOT EXISTS monsters');
+
+
     // Insert monsters
     for (const monster of monsters) {
       const query = `
