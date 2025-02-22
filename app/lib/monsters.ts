@@ -28,12 +28,10 @@ export interface Monster {
 }
 
 export async function getMonsters(): Promise<Monster[]> {
-  console.log('getMonsters: Starting...');
   await initDb();
 
   const db = await openDb();
   try {
-    console.log('getMonsters: Executing query...');
     const result = await db.execute(`
       SELECT
         id,
@@ -64,11 +62,6 @@ export async function getMonsters(): Promise<Monster[]> {
       FROM monsters
       ORDER BY name ASC
     `);
-
-    console.log('getMonsters: Got result:', {
-      rowCount: result.rows.length,
-      firstMonster: result.rows[0]
-    });
 
     return result.rows as Monster[];
   } catch (error) {

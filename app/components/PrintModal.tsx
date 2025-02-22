@@ -8,12 +8,7 @@ interface PrintModalProps {
 }
 
 export default function PrintModal({ monsters, selectedMonsters, onClose }: PrintModalProps) {
-  // Add console.log to check the data
-  console.log('All monsters:', monsters.length);
-  console.log('Selected monsters:', selectedMonsters);
-
   const selectedMonsterData = monsters.filter(m => selectedMonsters.has(m.name));
-  console.log('Filtered monsters:', selectedMonsterData.length);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
