@@ -1,16 +1,22 @@
 'use client';
 import { useState } from "react";
 import Statblock from "./Statblock";
+import CreateMonsterForm from "./CreateMonsterForm";
 import type { Monster } from '../lib/monsters';
+import { PrintIcon } from "../icons/PrintIcon";
+import PrintModal from "./PrintModal";
 
 interface ClientHomeProps {
   initialMonsters: Monster[];
 }
 
 export default function ClientHome({ initialMonsters }: ClientHomeProps) {
+  const [monsters, setMonsters] = useState<Monster[]>(initialMonsters);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMonsters, setSelectedMonsters] = useState<Set<string>>(new Set());
   const [showImages, setShowImages] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   const handleToggleSelect = (monsterName: string) => {
     setSelectedMonsters(prev => {
@@ -24,7 +30,30 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
     });
   };
 
-  const filteredMonsters = initialMonsters.filter(monster => {
+  const handleSaveMonster = async (monster: Monster) => {
+    try {
+      const response = await fetch('/api/monsters', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(monster),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save monster');
+      }
+
+      const savedMonster = await response.json();
+      setMonsters(prev => [...prev, savedMonster]);
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error('Error saving monster:', error);
+      // TODO: Add error handling UI
+    }
+  };
+
+  const filteredMonsters = monsters.filter(monster => {
     if (searchTerm) {
       return monster.name.toLowerCase().includes(searchTerm.toLowerCase());
     } else {
@@ -36,9 +65,25 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
     <div className="flex">
       {/* Selected Monsters Sidebar */}
       <div className="w-64 h-screen bg-amber-50 border-r-2 border-amber-900 p-4 sticky top-0">
-        <h2 className="text-xl text-amber-900 font-serif border-b-2 border-amber-900 pb-2 mb-4">
-          Selected Monsters
-        </h2>
+        <button
+          className="w-full mb-4 p-2 bg-amber-900 text-amber-50 rounded-lg
+                     hover:bg-amber-800 transition-colors font-serif"
+          onClick={() => setShowCreateForm(true)}
+        >
+          Create Monster
+        </button>
+        <div className="flex justify-between items-center border-b-2 border-amber-900 pb-2 mb-4">
+          <h2 className="text-xl text-amber-900 font-serif">Selected Monsters</h2>
+          {selectedMonsters.size > 0 && (
+            <button
+              onClick={() => setShowPrintModal(true)}
+              className="text-amber-900 hover:text-amber-700"
+              title="Print Selected Monsters"
+            >
+              <PrintIcon className="w-5 h-5" />
+            </button>
+          )}
+        </div>
         {selectedMonsters.size === 0 ? (
           <p className="text-amber-700 italic">No monsters selected</p>
         ) : (
@@ -97,6 +142,22 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
           ))}
         </div>
       </main>
+
+      {/* Create Monster Form Modal */}
+      {showCreateForm && (
+        <CreateMonsterForm
+          onClose={() => setShowCreateForm(false)}
+          onSave={handleSaveMonster}
+        />
+      )}
+
+      {showPrintModal && (
+        <PrintModal
+          monsters={monsters}
+          selectedMonsters={selectedMonsters}
+          onClose={() => setShowPrintModal(false)}
+        />
+      )}
     </div>
   );
 }
