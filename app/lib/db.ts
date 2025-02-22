@@ -1,17 +1,16 @@
 import mysql from 'mysql2/promise';
 import { DatabaseConnection, MySQLConnection } from './types';
-import { createMemoryDb } from './memoryDb';
 
 // Create database connection
 export async function openDb(): Promise<DatabaseConnection> {
-  // Return in-memory database for test, build, or CI
-  if (
-    process.env.NODE_ENV === 'test' ||
-    process.env.CI === 'true' ||
-    (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build')
-  ) {
-    return createMemoryDb();
-  }
+  // // Return in-memory database for test, build, or CI
+  // if (
+  //   process.env.NODE_ENV === 'test' ||
+  //   process.env.CI === 'true' ||
+  //   (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build')
+  // ) {
+  //   return createMemoryDb();
+  // }
 
   // Use MySQL for development/production
   const host = process.env.DB_HOST || 'localhost';
