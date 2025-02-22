@@ -10,6 +10,10 @@ body {
 }
 
 @media print {
+  @page {
+    margin: 0.5in;
+  }
+
   body * {
     visibility: hidden;
   }
@@ -19,6 +23,7 @@ body {
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
+    visibility: visible;
   }
 
   .print-modal * {
@@ -29,10 +34,13 @@ body {
     display: none !important;
   }
 
-  /* Ensure grid layout works in print */
-  .print-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+  .page-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 2rem;
+  }
+
+  .print-content {
+    display: block !important;
   }
 }

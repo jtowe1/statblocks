@@ -54,11 +54,22 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
   };
 
   const filteredMonsters = monsters.filter(monster => {
+    const matchesSearch = searchTerm
+      ? monster.name.toLowerCase().includes(searchTerm.toLowerCase())
+      : true;
+
+    // If there's a search term, show all matches regardless of selection
     if (searchTerm) {
-      return monster.name.toLowerCase().includes(searchTerm.toLowerCase());
-    } else {
-      return selectedMonsters.size === 0 || selectedMonsters.has(monster.name);
+      return matchesSearch;
     }
+
+    // If no search but has selections, only show selected
+    if (selectedMonsters.size > 0) {
+      return selectedMonsters.has(monster.name);
+    }
+
+    // Otherwise show all
+    return true;
   });
 
   return (
