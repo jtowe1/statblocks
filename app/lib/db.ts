@@ -4,13 +4,12 @@ import { InMemoryConnection } from './memoryDb';
 
 // Create database connection
 export async function openDb(): Promise<DatabaseConnection> {
-  // Return empty data during build
-  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build') {
-    return new InMemoryConnection();
-  }
-
-  // Use in-memory database for testing
-  if (process.env.NODE_ENV === 'test') {
+  // Return in-memory database for build, test, or CI
+  if (
+    process.env.NODE_ENV === 'test' ||
+    process.env.CI === 'true' ||
+    (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build')
+  ) {
     return new InMemoryConnection();
   }
 
