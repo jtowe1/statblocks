@@ -1,8 +1,11 @@
 describe('Monster App', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3000')
-    // Wait for the grid to be populated with monsters
+    // Wait for the initial data load and grid to be populated
+    cy.get('.grid', { timeout: 10000 }).should('exist')
     cy.get('.grid').children().should('have.length.gt', 0)
+    // Wait for at least one monster name to be visible
+    cy.get('.grid h1').should('have.length.gt', 0)
   })
 
   it('loads the initial page', () => {
