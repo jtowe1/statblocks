@@ -48,45 +48,52 @@ async function needsInitialization() {
 export async function initDb() {
   const db = await openDb();
 
-  console.log('Initializing database...');
+  console.log('Checking database schema...');
 
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS monsters (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL UNIQUE,
-      meta TEXT NOT NULL,
-      armor_class TEXT NOT NULL,
-      hit_points TEXT NOT NULL,
-      speed TEXT NOT NULL,
-      str TEXT NOT NULL,
-      str_mod TEXT NOT NULL,
-      dex TEXT NOT NULL,
-      dex_mod TEXT NOT NULL,
-      con TEXT NOT NULL,
-      con_mod TEXT NOT NULL,
-      intelligence TEXT NOT NULL,
-      intelligence_mod TEXT NOT NULL,
-      wis TEXT NOT NULL,
-      wis_mod TEXT NOT NULL,
-      cha TEXT NOT NULL,
-      cha_mod TEXT NOT NULL,
-      skills TEXT,
-      senses TEXT,
-      languages TEXT,
-      challenge TEXT NOT NULL,
-      traits TEXT,
-      actions TEXT,
-      img_url TEXT
-    )
-  `);
+  try {
+    // Create table if it doesn't exist
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS monsters (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL UNIQUE,
+        meta TEXT NOT NULL,
+        armor_class TEXT NOT NULL,
+        hit_points TEXT NOT NULL,
+        speed TEXT NOT NULL,
+        str TEXT NOT NULL,
+        str_mod TEXT NOT NULL,
+        dex TEXT NOT NULL,
+        dex_mod TEXT NOT NULL,
+        con TEXT NOT NULL,
+        con_mod TEXT NOT NULL,
+        intelligence TEXT NOT NULL,
+        intelligence_mod TEXT NOT NULL,
+        wis TEXT NOT NULL,
+        wis_mod TEXT NOT NULL,
+        cha TEXT NOT NULL,
+        cha_mod TEXT NOT NULL,
+        skills TEXT,
+        senses TEXT,
+        languages TEXT,
+        challenge TEXT NOT NULL,
+        traits TEXT,
+        actions TEXT,
+        img_url TEXT
+      )
+    `);
 
-  if (await needsInitialization()) {
-    console.log('Database needs initialization, seeding...');
-    const { default: seedDatabase } = await import('../../scripts/seedDb');
-    await seedDatabase();
-  } else {
-    console.log('Database already initialized');
+    // Only check for seeding during development or test
+    if (process.env.NODE_ENV !== 'production') {
+      const needsSeed = await needsInitialization();
+      if (needsSeed) {
+        console.log('Database needs seeding...');
+        const { default: seedDatabase } = await import('../../scripts/seedDb');
+        await seedDatabase();
+      } else {
+        console.log('Database already contains data');
+      }
+    }
+  } finally {
+    await db.close();
   }
-
-  return db;
 }

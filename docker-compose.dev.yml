@@ -14,7 +14,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "npm run seed-db && npm run dev"
+    command: npm run dev
 
   db:
     image: mysql:8
