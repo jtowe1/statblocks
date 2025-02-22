@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import monsters from '../app/data/monsters-seed-data.json';
 
-async function seedDatabase() {
+export default async function seedDatabase() {
   // Connect to MySQL without database selected
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',

@@ -87,8 +87,8 @@ export async function initDb() {
       const needsSeed = await needsInitialization();
       if (needsSeed) {
         console.log('Database needs seeding...');
-        const { default: seedDatabase } = await import('../../scripts/seedDb');
-        await seedDatabase();
+        const seedDatabase = await import('../../scripts/seedDb');
+        await seedDatabase.default();
       } else {
         console.log('Database already contains data');
       }
