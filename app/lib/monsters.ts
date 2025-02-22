@@ -1,4 +1,4 @@
-import { openDb, initDb } from './db';
+import { openDb } from './db';
 
 export interface Monster {
   name: string;

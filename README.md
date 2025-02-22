@@ -46,8 +46,8 @@ In the project directory, you can run:
 
 ### Code Quality
 - `npm run lint` - Runs ESLint to check code quality
-- `npm run type-check` - Runs TypeScript compiler to check types
-- `npm run type-check:watch` - Runs TypeScript compiler in watch mode
+- `npm run tsc` - Runs TypeScript compiler to check types
+- `npm run tsc:watch` - Runs TypeScript compiler in watch mode
 
 ## Learn More
 

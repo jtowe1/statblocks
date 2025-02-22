@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { openDb, initDb } from '@/app/lib/db';
+import { openDb } from '@/app/lib/db';
 import type { Monster } from '@/app/lib/monsters';
 
 interface MySQLError extends Error {
