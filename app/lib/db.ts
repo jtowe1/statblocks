@@ -48,6 +48,8 @@ async function needsInitialization() {
 export async function initDb() {
   const db = await openDb();
 
+  console.log('Initializing database...');
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS monsters (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -79,8 +81,11 @@ export async function initDb() {
   `);
 
   if (await needsInitialization()) {
+    console.log('Database needs initialization, seeding...');
     const { default: seedDatabase } = await import('../../scripts/seedDb');
     await seedDatabase();
+  } else {
+    console.log('Database already initialized');
   }
 
   return db;

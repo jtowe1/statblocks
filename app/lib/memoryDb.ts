@@ -1,10 +1,43 @@
 import { DatabaseConnection, DatabaseResult, DatabaseRow } from './types';
+import monsters from '../data/monsters-seed-data.json';
 
 type SQLParam = string | number | null;
 
 class InMemoryDatabase {
   private data: Record<string, DatabaseRow[]> = {};
   private autoIncrementIds: Record<string, number> = {};
+
+  constructor() {
+    // Initialize monsters table with seed data
+    this.data['monsters'] = monsters.map((monster, index) => ({
+      id: index + 1,
+      name: monster.name || '',
+      meta: monster.meta || '',
+      armor_class: monster.ArmorClass || '',
+      hit_points: monster.HitPoints || '',
+      speed: monster.Speed || '',
+      str: monster.STR || '',
+      str_mod: monster.STR_mod || '',
+      dex: monster.DEX || '',
+      dex_mod: monster.DEX_mod || '',
+      con: monster.CON || '',
+      con_mod: monster.CON_mod || '',
+      int: monster.INT || '',
+      int_mod: monster.INT_mod || '',
+      wis: monster.WIS || '',
+      wis_mod: monster.WIS_mod || '',
+      cha: monster.CHA || '',
+      cha_mod: monster.CHA_mod || '',
+      skills: monster.Skills || null,
+      senses: monster.Senses || null,
+      languages: monster.Languages || null,
+      challenge: monster.Challenge || '',
+      traits: monster.Traits || null,
+      actions: monster.Actions || null,
+      img_url: monster.img_url || null
+    }));
+    this.autoIncrementIds['monsters'] = monsters.length + 1;
+  }
 
   getTable(tableName: string): DatabaseRow[] {
     if (!this.data[tableName]) {
@@ -22,7 +55,14 @@ class InMemoryDatabase {
     }
 
     if (trimmedSql.startsWith('SELECT')) {
-      return { rows: this.getTable('monsters') };
+      const rows = this.getTable('monsters').map(row => ({
+        ...row,
+        INT: row.int,
+        INT_mod: row.int_mod,
+        intelligence: row.int,
+        intelligence_mod: row.int_mod
+      }));
+      return { rows };
     }
 
     if (trimmedSql.startsWith('INSERT')) {

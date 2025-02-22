@@ -11,7 +11,8 @@
     "cypress": "cypress open",
     "test:e2e": "cypress run",
     "type-check": "tsc --noEmit",
-    "type-check:watch": "tsc --noEmit --watch"
+    "type-check:watch": "tsc --noEmit --watch",
+    "test:ci": "bash scripts/test-ci.sh"
   },
   "dependencies": {
     "@planetscale/database": "^1.11.0",

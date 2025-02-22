@@ -11,6 +11,7 @@ interface ClientHomeProps {
 }
 
 export default function ClientHome({ initialMonsters }: ClientHomeProps) {
+  console.log('ClientHome: Rendering with', initialMonsters.length, 'monsters');
   const [monsters, setMonsters] = useState<Monster[]>(initialMonsters);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMonsters, setSelectedMonsters] = useState<Set<string>>(new Set());
