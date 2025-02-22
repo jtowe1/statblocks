@@ -5,6 +5,16 @@ import { DatabaseConnection, MySQLConnection, SQLiteConnection } from './types';
 
 // Create database connection
 export async function openDb(): Promise<DatabaseConnection> {
+  // Return empty data during build
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build') {
+    return {
+      async execute() {
+        return { rows: [], insertId: undefined, affectedRows: 0 };
+      },
+      async close() {},
+    };
+  }
+
   // Use SQLite for testing environment
   if (process.env.NODE_ENV === 'test') {
     const db = await open({
