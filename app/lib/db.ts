@@ -16,6 +16,7 @@ export async function openDb(): Promise<DatabaseConnection> {
   const host = process.env.DB_HOST || 'localhost';
   const connection = await mysql.createConnection({
     host: host,
+    port: 3310,
     user: 'user',
     password: 'password',
     database: 'monsters'
