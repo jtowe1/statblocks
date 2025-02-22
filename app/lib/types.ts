@@ -1,11 +1,19 @@
-import { Connection } from 'mysql2/promise';
+import { Connection, RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { Database } from 'sqlite';
 
-export type DatabaseResult = [any[], any];
+export type SQLiteResult = {
+  lastID?: number;
+  changes?: number;
+};
+
+export type MySQLResult = ResultSetHeader;
+export type DatabaseRow = RowDataPacket;
+
+export type DatabaseResult = [DatabaseRow[], MySQLResult | null];
 
 export interface DatabaseConnection {
-  execute(sql: string, params?: any[]): Promise<DatabaseResult>;
-  run?(sql: string, params?: any[]): Promise<any>;
+  execute(sql: string, params?: (string | number | null)[]): Promise<DatabaseResult>;
+  run?(sql: string, params?: (string | number | null)[]): Promise<SQLiteResult>;
   exec?(sql: string): Promise<void>;
   close(): Promise<void>;
 }
@@ -17,7 +25,7 @@ export class MySQLConnection implements DatabaseConnection {
     this.conn = connection;
   }
 
-  async execute(sql: string, params?: any[]): Promise<DatabaseResult> {
+  async execute(sql: string, params?: (string | number | null)[]): Promise<DatabaseResult> {
     return this.conn.execute(sql, params);
   }
 
@@ -33,12 +41,12 @@ export class SQLiteConnection implements DatabaseConnection {
     this.db = database;
   }
 
-  async execute(sql: string, params?: any[]): Promise<DatabaseResult> {
+  async execute(sql: string, params?: (string | number | null)[]): Promise<DatabaseResult> {
     const result = await this.db.all(sql, params);
-    return [result, null];
+    return [result as DatabaseRow[], null];
   }
 
-  async run(sql: string, params?: any[]): Promise<any> {
+  async run(sql: string, params?: (string | number | null)[]): Promise<SQLiteResult> {
     return this.db.run(sql, params);
   }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface CreatureStats {
   name: string;
@@ -62,11 +63,13 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
 
       {/* Image Section */}
       {props.showImages && props.img_url && (
-        <div className="mb-2">
-          <img
+        <div className="monster-image-container">
+          <Image
             src={props.img_url}
             alt={props.name}
-            className="mx-auto max-h-48 object-contain"
+            width={400}
+            height={400}
+            className="monster-image"
           />
         </div>
       )}

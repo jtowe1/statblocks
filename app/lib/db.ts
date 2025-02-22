@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import { DatabaseConnection, MySQLConnection, SQLiteConnection } from './types';
+import { DatabaseConnection, MySQLConnection, SQLiteConnection, DatabaseRow } from './types';
 
 // Create database connection
 export async function openDb(): Promise<DatabaseConnection> {
@@ -36,10 +36,12 @@ async function needsInitialization() {
       AND table_name = 'monsters'
     `);
 
-    if (!(rows as any[])[0].count) return true;
+    const firstRow = (rows as DatabaseRow[])[0];
+    if (!firstRow.count) return true;
 
     const [countResult] = await db.execute('SELECT COUNT(*) as count FROM monsters');
-    return (countResult as any[])[0].count === 0;
+    const countRow = (countResult as DatabaseRow[])[0];
+    return countRow.count === 0;
   } finally {
     await db.close();
   }
