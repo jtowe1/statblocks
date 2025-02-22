@@ -7,7 +7,7 @@ export default async function seedDatabase() {
 
   try {
     // Clear existing data
-    if (isSqlite) {
+    if (isSqlite && db.exec) {
       await db.exec('DELETE FROM monsters');
     } else {
       await db.execute('DELETE FROM monsters');
@@ -94,11 +94,7 @@ export default async function seedDatabase() {
     console.error('Error seeding database:', error);
     throw error;
   } finally {
-    if (isSqlite) {
-      await db.close();
-    } else {
-      await (db as any).end();
-    }
+    await db.close();
   }
 }
 

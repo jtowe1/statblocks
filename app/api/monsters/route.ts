@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { openDb, initDb } from '@/app/lib/db';
 import type { Monster } from '@/app/lib/monsters';
+import { DatabaseResult } from '@/app/lib/types';
 
 export async function POST(request: Request) {
   try {
@@ -10,7 +11,7 @@ export async function POST(request: Request) {
     const db = await openDb();
 
     try {
-      const [result] = await db.execute(`
+      const [result]: DatabaseResult = await db.execute(`
         INSERT INTO monsters (
           name, meta, armor_class, hit_points, speed,
           str, str_mod, dex, dex_mod, con, con_mod,
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
         id: (result as any).insertId
       });
     } finally {
-      await db.end();
+      await db.close();
     }
   } catch (error) {
     console.error('Error saving monster:', error);

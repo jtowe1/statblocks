@@ -1,4 +1,5 @@
 import { openDb, initDb } from './db';
+import { DatabaseResult } from './types';
 
 export interface Monster {
   name: string;
@@ -32,7 +33,7 @@ export async function getMonsters(): Promise<Monster[]> {
 
   const db = await openDb();
   try {
-    const [rows] = await db.execute(`
+    const [rows]: DatabaseResult = await db.execute(`
       SELECT
         id,
         name,
@@ -68,6 +69,6 @@ export async function getMonsters(): Promise<Monster[]> {
     console.error('Error fetching monsters:', error);
     throw error;
   } finally {
-    await db.end();
+    await db.close();
   }
 }
