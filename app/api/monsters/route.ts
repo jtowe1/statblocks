@@ -4,18 +4,17 @@ import type { Monster } from '@/app/lib/monsters';
 
 export async function POST(request: Request) {
   try {
-    // Initialize database first
     await initDb();
 
     const monster = await request.json() as Monster;
     const db = await openDb();
 
     try {
-      const result = await db.run(`
+      const [result] = await db.execute(`
         INSERT INTO monsters (
           name, meta, armor_class, hit_points, speed,
           str, str_mod, dex, dex_mod, con, con_mod,
-          int, int_mod, wis, wis_mod, cha, cha_mod,
+          intelligence, intelligence_mod, wis, wis_mod, cha, cha_mod,
           skills, senses, languages, challenge,
           traits, actions, img_url
         ) VALUES (
@@ -54,10 +53,10 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         ...monster,
-        id: result.lastID
+        id: (result as any).insertId
       });
     } finally {
-      await db.close();
+      await db.end();
     }
   } catch (error) {
     console.error('Error saving monster:', error);

@@ -1,12 +1,12 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import { join } from 'path';
+import mysql from 'mysql2/promise';
 
 // Create database connection
 export async function openDb() {
-  return open({
-    filename: join(process.cwd(), 'app', 'data', 'monsters.db'),
-    driver: sqlite3.Database
+  return mysql.createConnection({
+    host: 'localhost',
+    user: 'user',
+    password: 'password',
+    database: 'monsters'
   });
 }
 
@@ -14,18 +14,19 @@ export async function openDb() {
 async function needsInitialization() {
   const db = await openDb();
   try {
-    const tableExists = await db.get(`
-      SELECT name
-      FROM sqlite_master
-      WHERE type='table' AND name='monsters'
+    const [rows] = await db.execute(`
+      SELECT COUNT(*) as count
+      FROM information_schema.tables
+      WHERE table_schema = 'monsters'
+      AND table_name = 'monsters'
     `);
 
-    if (!tableExists) return true;
+    if (!(rows as any[])[0].count) return true;
 
-    const count = await db.get('SELECT COUNT(*) as count FROM monsters');
-    return count.count === 0;
+    const [countResult] = await db.execute('SELECT COUNT(*) as count FROM monsters');
+    return (countResult as any[])[0].count === 0;
   } finally {
-    await db.close();
+    await db.end();
   }
 }
 
@@ -33,10 +34,10 @@ async function needsInitialization() {
 export async function initDb() {
   const db = await openDb();
 
-  await db.exec(`
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS monsters (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL UNIQUE,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL UNIQUE,
       meta TEXT NOT NULL,
       armor_class TEXT NOT NULL,
       hit_points TEXT NOT NULL,
@@ -47,8 +48,8 @@ export async function initDb() {
       dex_mod TEXT NOT NULL,
       con TEXT NOT NULL,
       con_mod TEXT NOT NULL,
-      int TEXT NOT NULL,
-      int_mod TEXT NOT NULL,
+      intelligence TEXT NOT NULL,
+      intelligence_mod TEXT NOT NULL,
       wis TEXT NOT NULL,
       wis_mod TEXT NOT NULL,
       cha TEXT NOT NULL,

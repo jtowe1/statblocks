@@ -6,28 +6,25 @@ export default async function seedDatabase() {
 
   try {
     // Clear existing data
-    await db.exec('DELETE FROM monsters');
-
-    // Prepare insert statement
-    const stmt = await db.prepare(`
-      INSERT INTO monsters (
-        name, meta, armor_class, hit_points, speed,
-        str, str_mod, dex, dex_mod, con, con_mod,
-        int, int_mod, wis, wis_mod, cha, cha_mod,
-        skills, senses, languages, challenge,
-        traits, actions, img_url
-      ) VALUES (
-        ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?,
-        ?, ?, ?
-      )
-    `);
+    await db.execute('DELETE FROM monsters');
 
     // Insert monsters
     for (const monster of monsters) {
-      await stmt.run(
+      await db.execute(`
+        INSERT INTO monsters (
+          name, meta, armor_class, hit_points, speed,
+          str, str_mod, dex, dex_mod, con, con_mod,
+          intelligence, intelligence_mod, wis, wis_mod, cha, cha_mod,
+          skills, senses, languages, challenge,
+          traits, actions, img_url
+        ) VALUES (
+          ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?
+        )
+      `, [
         monster.name,
         monster.meta,
         monster.ArmorClass,
@@ -52,18 +49,15 @@ export default async function seedDatabase() {
         monster.Traits,
         monster.Actions,
         monster.img_url
-      );
+      ]);
     }
-
-    // Finalize the statement
-    await stmt.finalize();
 
     console.log(`Inserted ${monsters.length} monsters into the database`);
   } catch (error) {
     console.error('Error seeding database:', error);
     throw error;
   } finally {
-    await db.close();
+    await db.end();
   }
 }
 
