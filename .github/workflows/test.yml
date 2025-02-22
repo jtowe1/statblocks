@@ -35,7 +35,7 @@ jobs:
 
     - name: Initialize and seed database
       run: |
-        npm run setup-db
+        npm run seed-db
 
     - name: Run tests
       run: npm run test:e2e

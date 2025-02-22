@@ -26,13 +26,11 @@ In the project directory, you can run:
 
 ### Development
 - `npm run dev` - Starts the development server with Turbopack
-- `npm run dev:setup` - Sets up the database and starts the development server
 - `npm run docker:up` - Starts the Docker containers for development
 - `npm run docker:up:detached` - Starts the Docker containers in detached mode
 - `npm run docker:down` - Stops and removes the Docker containers
 
 ### Database
-- `npm run setup-db` - Initializes and seeds the database
 - `npm run seed-db` - Seeds the database with initial data
 
 ### Testing
