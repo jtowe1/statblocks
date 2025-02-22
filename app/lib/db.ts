@@ -1,27 +1,17 @@
 import mysql from 'mysql2/promise';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import { DatabaseConnection, MySQLConnection, SQLiteConnection } from './types';
+import { DatabaseConnection, MySQLConnection } from './types';
+import { InMemoryConnection } from './memoryDb';
 
 // Create database connection
 export async function openDb(): Promise<DatabaseConnection> {
   // Return empty data during build
   if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build') {
-    return {
-      async execute() {
-        return { rows: [], insertId: undefined, affectedRows: 0 };
-      },
-      async close() {},
-    };
+    return new InMemoryConnection();
   }
 
-  // Use SQLite for testing environment
+  // Use in-memory database for testing
   if (process.env.NODE_ENV === 'test') {
-    const db = await open({
-      filename: ':memory:',
-      driver: sqlite3.Database
-    });
-    return new SQLiteConnection(db);
+    return new InMemoryConnection();
   }
 
   // Use MySQL for development/production
