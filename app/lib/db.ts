@@ -1,7 +1,18 @@
 import mysql from 'mysql2/promise';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
 // Create database connection
 export async function openDb() {
+  // Use SQLite for testing environment
+  if (process.env.NODE_ENV === 'test') {
+    return open({
+      filename: ':memory:',
+      driver: sqlite3.Database
+    });
+  }
+
+  // Use MySQL for development/production
   const host = process.env.DB_HOST || 'localhost';
   return mysql.createConnection({
     host: host,
