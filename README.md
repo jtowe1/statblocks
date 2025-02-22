@@ -20,6 +20,35 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Available Scripts
+
+In the project directory, you can run:
+
+### Development
+- `npm run dev` - Starts the development server with Turbopack
+- `npm run dev:setup` - Sets up the database and starts the development server
+- `npm run docker:up` - Starts the Docker containers for development
+- `npm run docker:up:detached` - Starts the Docker containers in detached mode
+- `npm run docker:down` - Stops and removes the Docker containers
+
+### Database
+- `npm run setup-db` - Initializes and seeds the database
+- `npm run seed-db` - Seeds the database with initial data
+
+### Testing
+- `npm run cypress` - Opens the Cypress test runner
+- `npm run test:e2e` - Runs Cypress tests in headless mode
+- `npm run test:ci` - Runs tests in CI environment
+
+### Build and Production
+- `npm run build` - Builds the application for production
+- `npm run start` - Starts the production server
+
+### Code Quality
+- `npm run lint` - Runs ESLint to check code quality
+- `npm run type-check` - Runs TypeScript compiler to check types
+- `npm run type-check:watch` - Runs TypeScript compiler in watch mode
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
