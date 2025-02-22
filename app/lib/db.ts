@@ -1,16 +1,16 @@
 import mysql from 'mysql2/promise';
 import { DatabaseConnection, MySQLConnection } from './types';
-import { InMemoryConnection } from './memoryDb';
+import { createMemoryDb } from './memoryDb';
 
 // Create database connection
 export async function openDb(): Promise<DatabaseConnection> {
-  // Return in-memory database for build, test, or CI
+  // Return in-memory database for test, build, or CI
   if (
     process.env.NODE_ENV === 'test' ||
     process.env.CI === 'true' ||
     (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build')
   ) {
-    return new InMemoryConnection();
+    return createMemoryDb();
   }
 
   // Use MySQL for development/production
