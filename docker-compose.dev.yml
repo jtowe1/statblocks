@@ -10,9 +10,11 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=mysql://user:password@db:3306/monsters
+      - DB_HOST=db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    command: sh -c "npm run seed-db && npm run dev"
 
   db:
     image: mysql:8
@@ -25,6 +27,11 @@ services:
       - MYSQL_ROOT_PASSWORD=rootpassword
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "--password=password"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mysql_data:
