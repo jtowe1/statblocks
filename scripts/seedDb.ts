@@ -1,6 +1,6 @@
 import { openDb } from '../app/lib/db';
 import monsters from '../app/data/monsters-seed-data.json';
-import { DatabaseConnection, isSQLiteConnection } from '../app/lib/types';
+import { isSQLiteConnection } from '../app/lib/types';
 
 export default async function seedDatabase() {
   const db = await openDb();

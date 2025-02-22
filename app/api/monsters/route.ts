@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { openDb, initDb } from '@/app/lib/db';
 import type { Monster } from '@/app/lib/monsters';
-import { DatabaseResult, MySQLResult } from '@/app/lib/types';
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +10,7 @@ export async function POST(request: Request) {
     const db = await openDb();
 
     try {
-      const [, result] = await db.execute(`
+      const result = await db.execute(`
         INSERT INTO monsters (
           name, meta, armor_class, hit_points, speed,
           str, str_mod, dex, dex_mod, con, con_mod,
@@ -50,13 +49,11 @@ export async function POST(request: Request) {
         monster.Traits || null,
         monster.Actions || null,
         monster.img_url || null
-      ]) as DatabaseResult;
-
-      const mysqlResult = result as MySQLResult;
+      ]);
 
       return NextResponse.json({
         ...monster,
-        id: mysqlResult?.insertId || null
+        id: result.insertId || null
       });
     } finally {
       await db.close();

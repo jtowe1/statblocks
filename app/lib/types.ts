@@ -1,4 +1,4 @@
-import { Connection, RowDataPacket, ResultSetHeader } from 'mysql2/promise';
+import { Connection, RowDataPacket, ResultSetHeader, FieldPacket } from 'mysql2/promise';
 import { Database } from 'sqlite';
 
 export type SQLiteResult = {
@@ -6,10 +6,18 @@ export type SQLiteResult = {
   changes?: number;
 };
 
-export type MySQLResult = ResultSetHeader;
+// For SELECT queries
+export type MySQLSelectResult = [RowDataPacket[], FieldPacket[]];
+// For INSERT/UPDATE/DELETE queries
+export type MySQLModifyResult = [ResultSetHeader, FieldPacket[]];
+
 export type DatabaseRow = RowDataPacket;
 
-export type DatabaseResult = [DatabaseRow[], MySQLResult | null];
+export type DatabaseResult = {
+  rows: DatabaseRow[];
+  insertId?: number;
+  affectedRows?: number;
+};
 
 export interface DatabaseConnection {
   execute(sql: string, params?: (string | number | null)[]): Promise<DatabaseResult>;
@@ -26,7 +34,20 @@ export class MySQLConnection implements DatabaseConnection {
   }
 
   async execute(sql: string, params?: (string | number | null)[]): Promise<DatabaseResult> {
-    return this.conn.execute(sql, params);
+    const [rows] = await this.conn.execute(sql, params);
+    if (Array.isArray(rows)) {
+      // SELECT query
+      return {
+        rows: rows as RowDataPacket[],
+      };
+    } else {
+      // INSERT/UPDATE/DELETE query
+      return {
+        rows: [],
+        insertId: (rows as ResultSetHeader).insertId,
+        affectedRows: (rows as ResultSetHeader).affectedRows,
+      };
+    }
   }
 
   async close(): Promise<void> {
@@ -42,8 +63,19 @@ export class SQLiteConnection implements DatabaseConnection {
   }
 
   async execute(sql: string, params?: (string | number | null)[]): Promise<DatabaseResult> {
-    const result = await this.db.all(sql, params);
-    return [result as DatabaseRow[], null];
+    if (sql.trim().toUpperCase().startsWith('SELECT')) {
+      const rows = await this.db.all(sql, params);
+      return {
+        rows: rows as DatabaseRow[],
+      };
+    } else {
+      const result = await this.db.run(sql, params);
+      return {
+        rows: [],
+        insertId: result.lastID,
+        affectedRows: result.changes,
+      };
+    }
   }
 
   async run(sql: string, params?: (string | number | null)[]): Promise<SQLiteResult> {
