@@ -46,5 +46,8 @@ jobs:
       run: |
         npm run seed-db
 
-    - name: Run tests
-      run: npm run test:e2e
+    - name: Start Next.js app and run tests
+      run: |
+        npm run dev &
+        npx wait-on http://localhost:3000
+        npm run test:e2e
