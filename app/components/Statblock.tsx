@@ -31,6 +31,7 @@ interface CreatureStats {
 interface StatBlockProps extends CreatureStats {
   isSelected: boolean;
   onToggleSelect: (name: string) => void;
+  showImages: boolean;
 }
 
 const StatBlock: React.FC<StatBlockProps> = (props) => {
@@ -44,7 +45,7 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
   ];
 
   return (
-    <div className="bg-amber-50 border-2 border-amber-900 p-6 font-serif h-full relative">
+    <div className="bg-amber-50 border-2 border-amber-900 p-3 font-serif relative">
       <div className="absolute top-2 right-2">
         <input
           type="checkbox"
@@ -53,23 +54,33 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
           className="w-5 h-5 accent-amber-900"
         />
       </div>
+
       {/* Title Section */}
-      <div className="border-b-2 border-amber-900 pb-2">
+      <div className="border-b-2 border-amber-900 pb-1 mb-2">
         <h1 className="text-2xl text-amber-900">{props.name}</h1>
         <p className="italic text-amber-900">{props.meta}</p>
       </div>
 
-      {/* Stats Section */}
-      <div className="py-4">
-        <div className="text-amber-900">
-          <p><span className="font-bold">Armor Class</span> {props.ArmorClass}</p>
-          <p><span className="font-bold">Hit Points</span> {props.HitPoints}</p>
-          <p><span className="font-bold">Speed</span> {props.Speed}</p>
+      {/* Image Section */}
+      {props.showImages && props.img_url && (
+        <div className="mb-2">
+          <img
+            src={props.img_url}
+            alt={props.name}
+            className="mx-auto max-h-48 object-contain"
+          />
         </div>
+      )}
+
+      {/* Stats Section */}
+      <div className="text-amber-900 space-y-0.5">
+        <p><span className="font-bold">Armor Class</span> {props.ArmorClass}</p>
+        <p><span className="font-bold">Hit Points</span> {props.HitPoints}</p>
+        <p><span className="font-bold">Speed</span> {props.Speed}</p>
       </div>
 
       {/* Ability Scores */}
-      <div className="grid grid-cols-6 gap-2 border-y-2 border-amber-900 py-4">
+      <div className="grid grid-cols-6 gap-2 border-y-2 border-amber-900 py-1 my-2">
         {abilities.map(({ key, label }) => (
           <div key={key} className="text-center">
             <h3 className="font-bold text-amber-900">{label}</h3>
@@ -79,40 +90,33 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
       </div>
 
       {/* Skills and Proficiencies */}
-      <div className="py-4 text-amber-900">
-        <p><span className="font-bold">Skills</span> {props.Skills}</p>
-        <p><span className="font-bold">Senses</span> {props.Senses}</p>
-        <p><span className="font-bold">Languages</span> {props.Languages}</p>
-        <p><span className="font-bold">Challenge</span> {props.Challenge}</p>
+      <div className="text-amber-900 space-y-0.5">
+        {props.Skills && <p><span className="font-bold">Skills</span> {props.Skills}</p>}
+        {props.Senses && <p><span className="font-bold">Senses</span> {props.Senses}</p>}
+        {props.Languages && <p><span className="font-bold">Languages</span> {props.Languages}</p>}
+        {props.Challenge && <p><span className="font-bold">Challenge</span> {props.Challenge}</p>}
       </div>
 
       {/* Traits */}
-      <div className="py-2">
-        <h2 className="text-xl text-amber-900 border-b border-amber-900 mb-2">Traits</h2>
-        {props.Traits && (
-          <div dangerouslySetInnerHTML={{ __html: props.Traits }} />
-        )}
-      </div>
+      {props.Traits && (
+        <>
+          <h2 className="text-xl border-b border-amber-900 mt-2">Traits</h2>
+          <div
+            dangerouslySetInnerHTML={{ __html: props.Traits }}
+            className="text-amber-900 [&>p:last-child]:mb-0"
+          />
+        </>
+      )}
 
       {/* Actions */}
-      <div className="py-2">
-        <h2 className="text-xl text-amber-900 border-b border-amber-900 mb-2">Actions</h2>
-        {props.Actions && (
-          <div dangerouslySetInnerHTML={{ __html: props.Actions }} />
-        )}
-      </div>
-
-      {/* Optional Image */}
-      {props.img_url && (
-        <div className="mt-4">
-          <Image
-            src={props.img_url}
-            alt={props.name}
-            width={500}
-            height={300}
-            className="w-full h-auto rounded-lg"
+      {props.Actions && (
+        <>
+          <h2 className="text-xl border-b border-amber-900 mt-2">Actions</h2>
+          <div
+            dangerouslySetInnerHTML={{ __html: props.Actions }}
+            className="text-amber-900 [&>p:last-child]:mb-0"
           />
-        </div>
+        </>
       )}
     </div>
   );
