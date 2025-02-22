@@ -3,7 +3,7 @@ import mysql from 'mysql2/promise';
 // Create database connection
 export async function openDb() {
   return mysql.createConnection({
-    host: 'localhost',
+    host: 'db',
     user: 'user',
     password: 'password',
     database: 'monsters'
