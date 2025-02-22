@@ -38,6 +38,7 @@ export default function PrintModal({ monsters, selectedMonsters, onClose }: Prin
                 {...monster}
                 isSelected={false}
                 onToggleSelect={() => {}}
+                onCopy={() => {}}
                 showImages={true}
               />
             </div>

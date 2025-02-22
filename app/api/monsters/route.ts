@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { openDb, initDb } from '@/app/lib/db';
 import type { Monster } from '@/app/lib/monsters';
 
+interface MySQLError extends Error {
+  code?: string;
+}
+
 export async function POST(request: Request) {
   try {
     await initDb();
@@ -55,9 +59,9 @@ export async function POST(request: Request) {
         ...monster,
         id: result.insertId || null
       });
-    } catch (error: any) {
-      // Check for duplicate entry error (MySQL error code 1062)
-      if (error.code === 'ER_DUP_ENTRY') {
+    } catch (error: unknown) {
+      // Type guard to check if error is MySQLError
+      if (error instanceof Error && (error as MySQLError).code === 'ER_DUP_ENTRY') {
         return NextResponse.json(
           { error: 'A monster with this name already exists' },
           { status: 409 }
