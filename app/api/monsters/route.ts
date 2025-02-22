@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { openDb } from '@/app/lib/db';
+import { openDb, initDb } from '@/app/lib/db';
 import type { Monster } from '@/app/lib/monsters';
 
 export async function POST(request: Request) {
   try {
+    // Initialize database first
+    await initDb();
+
     const monster = await request.json() as Monster;
     const db = await openDb();
 

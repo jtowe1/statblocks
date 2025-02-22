@@ -1,4 +1,4 @@
-import { openDb } from './db';
+import { openDb, initDb } from './db';
 
 export interface Monster {
   name: string;
@@ -28,6 +28,9 @@ export interface Monster {
 }
 
 export async function getMonsters(): Promise<Monster[]> {
+  // Initialize database first
+  await initDb();
+
   const db = await openDb();
   try {
     const monsters = await db.all(`

@@ -1,8 +1,8 @@
-import { initDb } from '../app/lib/db';
+import { openDb } from '../app/lib/db';
 import monsters from '../app/data/monsters-seed-data.json';
 
-async function seedDatabase() {
-  const db = await initDb();
+export default async function seedDatabase() {
+  const db = await openDb();
 
   try {
     // Clear existing data
@@ -61,10 +61,13 @@ async function seedDatabase() {
     console.log(`Inserted ${monsters.length} monsters into the database`);
   } catch (error) {
     console.error('Error seeding database:', error);
+    throw error;
   } finally {
-    // Close the database connection
     await db.close();
   }
 }
 
-seedDatabase().catch(console.error);
+// Only run directly if called from command line
+if (require.main === module) {
+  seedDatabase().catch(console.error);
+}

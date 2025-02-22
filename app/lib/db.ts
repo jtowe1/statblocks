@@ -10,6 +10,25 @@ export async function openDb() {
   });
 }
 
+// Check if database needs initialization
+async function needsInitialization() {
+  const db = await openDb();
+  try {
+    const tableExists = await db.get(`
+      SELECT name
+      FROM sqlite_master
+      WHERE type='table' AND name='monsters'
+    `);
+
+    if (!tableExists) return true;
+
+    const count = await db.get('SELECT COUNT(*) as count FROM monsters');
+    return count.count === 0;
+  } finally {
+    await db.close();
+  }
+}
+
 // Initialize database schema
 export async function initDb() {
   const db = await openDb();
@@ -43,6 +62,11 @@ export async function initDb() {
       img_url TEXT
     )
   `);
+
+  if (await needsInitialization()) {
+    const { default: seedDatabase } = await import('../../scripts/seedDb');
+    await seedDatabase();
+  }
 
   return db;
 }
