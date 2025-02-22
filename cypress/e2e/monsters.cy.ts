@@ -73,4 +73,39 @@ describe('Monster App', () => {
     cy.get('.grid').children().should('have.length.gt', 0)
     cy.get('.grid').find('.monster-image-container').should('exist')
   })
+
+  it('can create a new monster and close the modal', () => {
+    // Set up the intercept before any actions
+    cy.intercept('POST', '/api/monsters').as('createMonster')
+
+    // Click create monster button in the sidebar
+    cy.contains('button', 'Create Monster').click()
+
+    // Verify modal is visible
+    cy.get('.fixed.inset-0').should('exist')
+
+    // Fill out required fields
+    const uniqueName = `Test Monster ${Date.now()}`
+    cy.get('input[name="name"]').type(uniqueName)
+    cy.get('input[name="meta"]').type('Medium humanoid, neutral evil')
+    cy.get('input[name="ArmorClass"]').type('15')
+    cy.get('input[name="HitPoints"]').type('20')
+    cy.get('input[name="Speed"]').type('30 ft.')
+    cy.get('input[name="STR"]').type('16')
+    cy.get('input[name="DEX"]').type('14')
+    cy.get('input[name="CON"]').type('14')
+    cy.get('input[name="INT"]').type('10')
+    cy.get('input[name="WIS"]').type('10')
+    cy.get('input[name="CHA"]').type('10')
+    cy.get('input[name="Challenge"]').type('1')
+
+    // Submit the form by clicking the submit button
+    cy.get('form').submit()
+
+    // Wait for the POST request to complete
+    cy.wait('@createMonster')
+
+    // Verify modal is gone
+    cy.get('.fixed.inset-0').should('not.exist')
+  })
 })
