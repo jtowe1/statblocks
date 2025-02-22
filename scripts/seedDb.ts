@@ -1,5 +1,5 @@
 import { initDb } from '../app/lib/db';
-import monsters from '../app/data/monsters.json';
+import monsters from '../app/data/monsters-seed-data.json';
 
 async function seedDatabase() {
   const db = await initDb();
