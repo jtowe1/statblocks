@@ -28,7 +28,10 @@ interface CreatureStats {
   img_url?: string;
 }
 
-type StatBlockProps = CreatureStats;
+interface StatBlockProps extends CreatureStats {
+  isSelected: boolean;
+  onToggleSelect: (name: string) => void;
+}
 
 const StatBlock: React.FC<StatBlockProps> = (props) => {
   const abilities = [
@@ -41,7 +44,15 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
   ];
 
   return (
-    <div className="bg-amber-50 border-2 border-amber-900 p-6 font-serif h-full">
+    <div className="bg-amber-50 border-2 border-amber-900 p-6 font-serif h-full relative">
+      <div className="absolute top-2 right-2">
+        <input
+          type="checkbox"
+          checked={props.isSelected}
+          onChange={() => props.onToggleSelect(props.name)}
+          className="w-5 h-5 accent-amber-900"
+        />
+      </div>
       {/* Title Section */}
       <div className="border-b-2 border-amber-900 pb-2">
         <h1 className="text-2xl text-amber-900">{props.name}</h1>
