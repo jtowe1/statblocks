@@ -17,6 +17,8 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
   const [showImages, setShowImages] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [monsterToCopy, setMonsterToCopy] = useState<Monster | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleToggleSelect = (monsterName: string) => {
     setSelectedMonsters(prev => {
@@ -32,6 +34,7 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
 
   const handleSaveMonster = async (monster: Monster) => {
     try {
+      setError(null);
       const response = await fetch('/api/monsters', {
         method: 'POST',
         headers: {
@@ -40,17 +43,23 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
         body: JSON.stringify(monster),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to save monster');
+        throw new Error(data.error || 'Failed to save monster');
       }
 
-      const savedMonster = await response.json();
-      setMonsters(prev => [...prev, savedMonster]);
+      setMonsters(prev => [...prev, data]);
       setShowCreateForm(false);
     } catch (error) {
       console.error('Error saving monster:', error);
-      // TODO: Add error handling UI
+      setError(error instanceof Error ? error.message : 'Failed to save monster');
     }
+  };
+
+  const handleCopyMonster = (monster: Monster) => {
+    setMonsterToCopy(monster);
+    setShowCreateForm(true);
   };
 
   const filteredMonsters = monsters.filter(monster => {
@@ -148,6 +157,7 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
               {...monster}
               isSelected={selectedMonsters.has(monster.name)}
               onToggleSelect={handleToggleSelect}
+              onCopy={handleCopyMonster}
               showImages={showImages}
             />
           ))}
@@ -157,8 +167,14 @@ export default function ClientHome({ initialMonsters }: ClientHomeProps) {
       {/* Create Monster Form Modal */}
       {showCreateForm && (
         <CreateMonsterForm
-          onClose={() => setShowCreateForm(false)}
+          onClose={() => {
+            setShowCreateForm(false);
+            setMonsterToCopy(null);
+            setError(null);
+          }}
           onSave={handleSaveMonster}
+          initialData={monsterToCopy || undefined}
+          error={error}
         />
       )}
 

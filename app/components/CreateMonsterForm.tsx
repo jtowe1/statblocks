@@ -4,34 +4,36 @@ import type { Monster } from '../lib/monsters';
 interface CreateMonsterFormProps {
   onClose: () => void;
   onSave: (monster: Monster) => void;
+  initialData?: Monster;
+  error?: string | null;
 }
 
-export default function CreateMonsterForm({ onClose, onSave }: CreateMonsterFormProps) {
+export default function CreateMonsterForm({ onClose, onSave, initialData, error }: CreateMonsterFormProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    meta: '',
-    ArmorClass: '',
-    HitPoints: '',
-    Speed: '',
-    STR: '',
-    STR_mod: '',
-    DEX: '',
-    DEX_mod: '',
-    CON: '',
-    CON_mod: '',
-    INT: '',
-    INT_mod: '',
-    WIS: '',
-    WIS_mod: '',
-    CHA: '',
-    CHA_mod: '',
-    Skills: '',
-    Senses: '',
-    Languages: '',
-    Challenge: '',
-    Traits: '',
-    Actions: '',
-    img_url: ''
+    name: initialData?.name || '',
+    meta: initialData?.meta || '',
+    ArmorClass: initialData?.ArmorClass || '',
+    HitPoints: initialData?.HitPoints || '',
+    Speed: initialData?.Speed || '',
+    STR: initialData?.STR || '',
+    STR_mod: initialData?.STR_mod || '',
+    DEX: initialData?.DEX || '',
+    DEX_mod: initialData?.DEX_mod || '',
+    CON: initialData?.CON || '',
+    CON_mod: initialData?.CON_mod || '',
+    INT: initialData?.INT || '',
+    INT_mod: initialData?.INT_mod || '',
+    WIS: initialData?.WIS || '',
+    WIS_mod: initialData?.WIS_mod || '',
+    CHA: initialData?.CHA || '',
+    CHA_mod: initialData?.CHA_mod || '',
+    Skills: initialData?.Skills || '',
+    Senses: initialData?.Senses || '',
+    Languages: initialData?.Languages || '',
+    Challenge: initialData?.Challenge || '',
+    Traits: initialData?.Traits || '',
+    Actions: initialData?.Actions || '',
+    img_url: initialData?.img_url || ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -69,6 +71,13 @@ export default function CreateMonsterForm({ onClose, onSave }: CreateMonsterForm
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-amber-50 p-6 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl text-amber-900 font-serif mb-4">Create Monster</h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border-2 border-red-700 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

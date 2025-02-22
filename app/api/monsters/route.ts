@@ -55,6 +55,15 @@ export async function POST(request: Request) {
         ...monster,
         id: result.insertId || null
       });
+    } catch (error: any) {
+      // Check for duplicate entry error (MySQL error code 1062)
+      if (error.code === 'ER_DUP_ENTRY') {
+        return NextResponse.json(
+          { error: 'A monster with this name already exists' },
+          { status: 409 }
+        );
+      }
+      throw error;
     } finally {
       await db.close();
     }
