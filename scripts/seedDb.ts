@@ -1,5 +1,6 @@
 import { openDb } from '../app/lib/db';
 import monsters from '../app/data/monsters-seed-data.json';
+import { DatabaseConnection, isSQLiteConnection } from '../app/lib/types';
 
 export default async function seedDatabase() {
   const db = await openDb();
@@ -7,7 +8,7 @@ export default async function seedDatabase() {
 
   try {
     // Clear existing data
-    if (isSqlite && db.exec) {
+    if (isSqlite && isSQLiteConnection(db)) {
       await db.exec('DELETE FROM monsters');
     } else {
       await db.execute('DELETE FROM monsters');
@@ -32,7 +33,7 @@ export default async function seedDatabase() {
         )
       `;
 
-      if (isSqlite) {
+      if (isSqlite && isSQLiteConnection(db)) {
         await db.run(query, [
           monster.name || '',
           monster.meta || '',

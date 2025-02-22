@@ -41,7 +41,7 @@ async function needsInitialization() {
     const [countResult] = await db.execute('SELECT COUNT(*) as count FROM monsters');
     return (countResult as any[])[0].count === 0;
   } finally {
-    await db.end();
+    await db.close();
   }
 }
 

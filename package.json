@@ -9,7 +9,9 @@
     "lint": "next lint",
     "seed-db": "tsx scripts/seedDb.ts",
     "cypress": "cypress open",
-    "test:e2e": "cypress run"
+    "test:e2e": "cypress run",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch"
   },
   "dependencies": {
     "@planetscale/database": "^1.11.0",

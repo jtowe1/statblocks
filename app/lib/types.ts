@@ -8,7 +8,6 @@ export interface DatabaseConnection {
   run?(sql: string, params?: any[]): Promise<any>;
   exec?(sql: string): Promise<void>;
   close(): Promise<void>;
-  end?(): Promise<void>;
 }
 
 export class MySQLConnection implements DatabaseConnection {
@@ -23,10 +22,6 @@ export class MySQLConnection implements DatabaseConnection {
   }
 
   async close(): Promise<void> {
-    return this.conn.end();
-  }
-
-  end(): Promise<void> {
     return this.conn.end();
   }
 }
@@ -54,4 +49,13 @@ export class SQLiteConnection implements DatabaseConnection {
   async close(): Promise<void> {
     return this.db.close();
   }
+}
+
+// Type guard functions
+export function isSQLiteConnection(db: DatabaseConnection): db is SQLiteConnection {
+  return 'run' in db && 'exec' in db;
+}
+
+export function isMySQLConnection(db: DatabaseConnection): db is MySQLConnection {
+  return !('run' in db) && !('exec' in db);
 }
