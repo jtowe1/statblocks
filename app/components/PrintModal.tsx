@@ -3,19 +3,15 @@ import Statblock from './Statblock';
 
 interface PrintModalProps {
   monsters: Monster[];
-  selectedMonsters: Set<string>;
   onClose: () => void;
 }
 
-export default function PrintModal({ monsters, selectedMonsters, onClose }: PrintModalProps) {
-  const selectedMonsterData = monsters.filter(m => selectedMonsters.has(m.name));
-  console.log(selectedMonsterData);
-
+export default function PrintModal({ monsters, onClose }: PrintModalProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg w-full max-w-7xl max-h-[90vh] overflow-y-auto print-modal">
         <div className="flex justify-between items-center mb-4 no-print">
-          <h2 className="text-2xl text-amber-900 font-serif">Print Preview ({selectedMonsterData.length} monsters)</h2>
+          <h2 className="text-2xl text-amber-900 font-serif">Print Preview ({monsters.length} monsters)</h2>
           <div className="space-x-4">
             <button
               onClick={() => window.print()}
@@ -33,14 +29,13 @@ export default function PrintModal({ monsters, selectedMonsters, onClose }: Prin
         </div>
 
         <div className="print-content">
-          {selectedMonsterData.map((monster) => (
+          {monsters.map((monster) => (
             <div key={monster.name} className="page-break">
               <Statblock
                 {...monster}
-                isSelected={false}
-                onToggleSelect={() => {}}
                 onCopy={() => {}}
-                showImages={false}
+                showImages={true}
+                onAddToEncounter={() => {}}
               />
             </div>
           ))}

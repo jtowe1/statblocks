@@ -1,6 +1,7 @@
 import { openDb } from './db';
 
 export interface Monster {
+  id?: number;
   name: string;
   meta: string;
   ArmorClass: string;
@@ -25,6 +26,7 @@ export interface Monster {
   Traits?: string;
   Actions?: string;
   img_url?: string;
+  encounter_monster_id?: number;
 }
 
 export async function getMonsters(): Promise<Monster[]> {

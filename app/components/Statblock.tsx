@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 
 interface CreatureStats {
+  id?: number;
   name: string;
   meta: string;
   ArmorClass: string;
@@ -32,7 +33,6 @@ interface StatBlockProps extends CreatureStats {
   onCopy: (monster: CreatureStats) => void;
   showImages: boolean;
   onAddToEncounter: (monsterId: number) => void;
-  id: number;
 }
 
 const StatBlock: React.FC<StatBlockProps> = (props) => {
@@ -49,7 +49,7 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
     <div className="bg-amber-50 border-2 border-amber-900 p-3 font-serif relative">
       <div className="flex justify-end gap-2 mb-2">
         <button
-          onClick={() => props.onAddToEncounter(props.id)}
+          onClick={() => props.id && props.onAddToEncounter(props.id)}
           className="px-2 py-1 text-sm bg-amber-900 text-amber-50 rounded hover:bg-amber-800"
         >
           Add to Encounter

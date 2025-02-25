@@ -3,7 +3,6 @@ import { useState } from "react";
 import Statblock from "./Statblock";
 import CreateMonsterForm from "./CreateMonsterForm";
 import type { Monster } from '../lib/monsters';
-import { PrintIcon } from "../icons/PrintIcon";
 import PrintModal from "./PrintModal";
 import CreateEncounterForm from "./CreateEncounterForm";
 import { Encounter } from '../lib/encounters';
@@ -17,7 +16,6 @@ interface ClientHomeProps {
 export default function ClientHome({ initialMonsters, initialEncounters }: ClientHomeProps) {
   const [monsters, setMonsters] = useState<Monster[]>(initialMonsters);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMonsters, setSelectedMonsters] = useState<Set<string>>(new Set());
   const [showImages, setShowImages] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
@@ -29,18 +27,6 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
   const [monsterToAdd, setMonsterToAdd] = useState<Monster | null>(null);
   const [selectedEncounter, setSelectedEncounter] = useState<Encounter | null>(null);
   const [encounterMonsters, setEncounterMonsters] = useState<Monster[]>([]);
-
-  const handleToggleSelect = (monsterName: string) => {
-    setSelectedMonsters(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(monsterName)) {
-        newSet.delete(monsterName);
-      } else {
-        newSet.add(monsterName);
-      }
-      return newSet;
-    });
-  };
 
   const handleSaveMonster = async (monster: Monster) => {
     try {
@@ -171,24 +157,11 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
     }
   };
 
-  const filteredMonsters = monsters.filter(monster => {
-    const matchesSearch = searchTerm
+  const filteredMonsters = monsters.filter(monster =>
+    searchTerm
       ? monster.name.toLowerCase().includes(searchTerm.toLowerCase())
-      : true;
-
-    // If there's a search term, show all matches regardless of selection
-    if (searchTerm) {
-      return matchesSearch;
-    }
-
-    // If no search but has selections, only show selected
-    if (selectedMonsters.size > 0) {
-      return selectedMonsters.has(monster.name);
-    }
-
-    // Otherwise show all
-    return true;
-  });
+      : true
+  );
 
   return (
     <div className="flex">
@@ -330,7 +303,6 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
       {showPrintModal && (
         <PrintModal
           monsters={monsters}
-          selectedMonsters={selectedMonsters}
           onClose={() => setShowPrintModal(false)}
         />
       )}

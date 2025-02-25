@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import { openDb } from '@/app/lib/db';
 
-interface MySQLError extends Error {
-  code?: string;
-}
-
 export async function POST(request: Request) {
   try {
     const { name } = await request.json();
