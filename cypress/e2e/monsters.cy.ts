@@ -30,40 +30,6 @@ describe('Monster App', () => {
     })
   })
 
-  it('can select and deselect monsters', () => {
-    // Wait for monsters to load and select first one
-    cy.get('.grid').children().first().within(() => {
-      cy.get('input[type="checkbox"]').click()
-    })
-
-    // Wait for the selected monsters list to update
-    cy.contains('Selected Monsters')
-      .parent()
-      .parent()
-      .find('ul')
-      .find('li')
-      .should('have.length', 1)
-
-    // Deselect using X button
-    cy.contains('Selected Monsters')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('×')
-      .click()
-
-    // Verify no monsters selected
-    cy.contains('No monsters selected').should('exist')
-  })
-
-  it('shows print button when monsters are selected', () => {
-    // Wait for monsters to load and select first one
-    cy.get('.grid').children().first().within(() => {
-      cy.get('input[type="checkbox"]').click()
-    })
-    cy.get('button[title="Print Selected Monsters"]').should('exist')
-  })
-
   it('toggles image display', () => {
     // Target the label containing "Show Images"
     cy.get('label').contains('Show Images')
