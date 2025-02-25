@@ -9,6 +9,7 @@ interface PrintModalProps {
 
 export default function PrintModal({ monsters, selectedMonsters, onClose }: PrintModalProps) {
   const selectedMonsterData = monsters.filter(m => selectedMonsters.has(m.name));
+  console.log(selectedMonsterData);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -39,7 +40,7 @@ export default function PrintModal({ monsters, selectedMonsters, onClose }: Prin
                 isSelected={false}
                 onToggleSelect={() => {}}
                 onCopy={() => {}}
-                showImages={true}
+                showImages={false}
               />
             </div>
           ))}

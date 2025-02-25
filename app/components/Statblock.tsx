@@ -29,10 +29,10 @@ interface CreatureStats {
 }
 
 interface StatBlockProps extends CreatureStats {
-  isSelected: boolean;
-  onToggleSelect: (name: string) => void;
-  showImages: boolean;
   onCopy: (monster: CreatureStats) => void;
+  showImages: boolean;
+  onAddToEncounter: (monsterId: number) => void;
+  id: number;
 }
 
 const StatBlock: React.FC<StatBlockProps> = (props) => {
@@ -47,19 +47,19 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
 
   return (
     <div className="bg-amber-50 border-2 border-amber-900 p-3 font-serif relative">
-      <div className="absolute top-2 right-2 flex gap-2">
+      <div className="flex justify-end gap-2 mb-2">
+        <button
+          onClick={() => props.onAddToEncounter(props.id)}
+          className="px-2 py-1 text-sm bg-amber-900 text-amber-50 rounded hover:bg-amber-800"
+        >
+          Add to Encounter
+        </button>
         <button
           onClick={() => props.onCopy(props)}
           className="px-2 py-1 text-sm bg-amber-900 text-amber-50 rounded hover:bg-amber-800"
         >
           Copy
         </button>
-        <input
-          type="checkbox"
-          checked={props.isSelected}
-          onChange={() => props.onToggleSelect(props.name)}
-          className="w-5 h-5 accent-amber-900"
-        />
       </div>
 
       {/* Title Section */}

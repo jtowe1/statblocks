@@ -48,7 +48,31 @@ export default async function seedDatabase() {
       )
     `);
 
+    // Create encounters table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS encounters (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create encounter_monsters table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS encounter_monsters (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        encounter_id INT NOT NULL,
+        monster_id INT NOT NULL,
+        FOREIGN KEY (encounter_id) REFERENCES encounters(id) ON DELETE CASCADE,
+        FOREIGN KEY (monster_id) REFERENCES monsters(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Clear existing data
+    await connection.query('DELETE FROM encounter_monsters');
+    await connection.query('DELETE FROM encounters');
     await connection.query('DELETE FROM monsters');
 
     // Insert monsters

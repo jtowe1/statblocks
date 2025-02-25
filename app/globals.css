@@ -2,45 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
-
+/*
 @media print {
   @page {
     margin: 0.5in;
   }
 
-  body * {
-    visibility: hidden;
+  body > * {
+    display: none !important;
   }
 
   .print-modal {
+    display: block !important;
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
-    visibility: visible;
+    background: none !important;
   }
 
-  .print-modal * {
-    visibility: visible;
+  .print-modal .print-content {
+    display: block !important;
   }
 
-  .no-print {
+  .print-modal .print-content * {
+    visibility: visible !important;
+  }
+
+  .print-modal .no-print,
+  .print-modal .bg-black {
     display: none !important;
   }
 
   .page-break {
+    page-break-before: auto;
+    page-break-after: auto;
     page-break-inside: avoid;
     break-inside: avoid;
     margin-bottom: 2rem;
   }
-
-  .print-content {
-    display: block !important;
-  }
 }
+*/
