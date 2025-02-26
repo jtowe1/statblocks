@@ -33,6 +33,9 @@ interface StatBlockProps extends CreatureStats {
   onCopy: (monster: CreatureStats) => void;
   showImages: boolean;
   onAddToEncounter: (monsterId: number) => void;
+  onRemoveFromEncounter?: (encounterMonsterId: number) => void;
+  encounter_monster_id?: number;
+  isInEncounter?: boolean;
 }
 
 const StatBlock: React.FC<StatBlockProps> = (props) => {
@@ -48,12 +51,21 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
   return (
     <div className="bg-amber-50 border-2 border-amber-900 p-3 font-serif relative">
       <div className="flex justify-end gap-2 mb-2">
-        <button
-          onClick={() => props.id && props.onAddToEncounter(props.id)}
-          className="px-2 py-1 text-sm bg-amber-900 text-amber-50 rounded hover:bg-amber-800"
-        >
-          Add to Encounter
-        </button>
+        {props.isInEncounter && props.encounter_monster_id && props.onRemoveFromEncounter ? (
+          <button
+            onClick={() => props.onRemoveFromEncounter!(props.encounter_monster_id!)}
+            className="px-2 py-1 text-sm bg-red-700 text-white rounded hover:bg-red-800"
+          >
+            Remove From Encounter
+          </button>
+        ) : (
+          <button
+            onClick={() => props.id && props.onAddToEncounter(props.id)}
+            className="px-2 py-1 text-sm bg-amber-900 text-amber-50 rounded hover:bg-amber-800"
+          >
+            Add to Encounter
+          </button>
+        )}
         <button
           onClick={() => props.onCopy(props)}
           className="px-2 py-1 text-sm bg-amber-900 text-amber-50 rounded hover:bg-amber-800"

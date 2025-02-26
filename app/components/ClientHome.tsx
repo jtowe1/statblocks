@@ -157,6 +157,24 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
     }
   };
 
+  const handleRemoveFromEncounter = async (encounterMonsterId: number) => {
+    try {
+      const response = await fetch(`/api/encounters/monsters/${encounterMonsterId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove monster from encounter');
+      }
+
+      setEncounterMonsters(prev =>
+        prev.filter(m => m.encounter_monster_id !== encounterMonsterId)
+      );
+    } catch (error) {
+      console.error('Error removing monster from encounter:', error);
+    }
+  };
+
   const filteredMonsters = monsters.filter(monster =>
     searchTerm
       ? monster.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -240,7 +258,8 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
                     onCopy={handleCopyMonster}
                     showImages={showImages}
                     onAddToEncounter={handleAddToEncounter}
-                    id={monster.id}
+                    onRemoveFromEncounter={handleRemoveFromEncounter}
+                    isInEncounter={true}
                   />
                 ))}
               </div>
@@ -278,7 +297,6 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
                   onCopy={handleCopyMonster}
                   showImages={showImages}
                   onAddToEncounter={handleAddToEncounter}
-                  id={monster.id}
                 />
               ))}
             </div>
