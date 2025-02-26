@@ -31,6 +31,7 @@ interface CreatureStats {
 
 interface StatBlockProps extends CreatureStats {
   onCopy: (monster: CreatureStats) => void;
+  onEdit?: (monster: CreatureStats) => void;
   showImages: boolean;
   onAddToEncounter: (monsterId: number) => void;
   onRemoveFromEncounter?: (encounterMonsterId: number) => void;
@@ -72,6 +73,14 @@ const StatBlock: React.FC<StatBlockProps> = (props) => {
         >
           Copy
         </button>
+        {props.onEdit && (
+          <button
+            onClick={() => props.onEdit!(props)}
+            className="px-2 py-1 text-sm bg-amber-900 text-amber-50 rounded hover:bg-amber-800"
+          >
+            Edit
+          </button>
+        )}
       </div>
 
       {/* Title Section */}

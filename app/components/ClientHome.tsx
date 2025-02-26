@@ -27,12 +27,19 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
   const [monsterToAdd, setMonsterToAdd] = useState<Monster | null>(null);
   const [selectedEncounter, setSelectedEncounter] = useState<Encounter | null>(null);
   const [encounterMonsters, setEncounterMonsters] = useState<Monster[]>([]);
+  const [monsterToEdit, setMonsterToEdit] = useState<Monster | null>(null);
 
   const handleSaveMonster = async (monster: Monster) => {
     try {
       setError(null);
-      const response = await fetch('/api/monsters', {
-        method: 'POST',
+
+      // Determine if this is an edit or a new monster
+      const isEdit = !!monsterToEdit;
+      const method = isEdit ? 'PUT' : 'POST';
+      const url = isEdit ? `/api/monsters/${monsterToEdit.id}` : '/api/monsters';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -42,14 +49,22 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to save monster');
+        throw new Error(data.error || `Failed to ${isEdit ? 'update' : 'save'} monster`);
       }
 
-      setMonsters(prev => [...prev, data]);
+      if (isEdit) {
+        // Update the monster in the state
+        setMonsters(prev => prev.map(m => m.id === data.id ? data : m));
+      } else {
+        // Add the new monster to the state
+        setMonsters(prev => [...prev, data]);
+      }
+
       setShowCreateForm(false);
+      setMonsterToEdit(null);
     } catch (error) {
-      console.error('Error saving monster:', error);
-      setError(error instanceof Error ? error.message : 'Failed to save monster');
+      console.error(`Error ${monsterToEdit ? 'updating' : 'saving'} monster:`, error);
+      setError(error instanceof Error ? error.message : `Failed to ${monsterToEdit ? 'update' : 'save'} monster`);
     }
   };
 
@@ -175,6 +190,11 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
     }
   };
 
+  const handleEditMonster = (monster: Monster) => {
+    setMonsterToEdit(monster);
+    setShowCreateForm(true);
+  };
+
   const filteredMonsters = monsters.filter(monster =>
     searchTerm
       ? monster.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -256,6 +276,7 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
                     key={`${monster.id}-${monster.encounter_monster_id}`}
                     {...monster}
                     onCopy={handleCopyMonster}
+                    onEdit={handleEditMonster}
                     showImages={showImages}
                     onAddToEncounter={handleAddToEncounter}
                     onRemoveFromEncounter={handleRemoveFromEncounter}
@@ -295,6 +316,7 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
                   key={monster.id}
                   {...monster}
                   onCopy={handleCopyMonster}
+                  onEdit={handleEditMonster}
                   showImages={showImages}
                   onAddToEncounter={handleAddToEncounter}
                 />
@@ -310,10 +332,12 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
           onClose={() => {
             setShowCreateForm(false);
             setMonsterToCopy(null);
+            setMonsterToEdit(null);
             setError(null);
           }}
           onSave={handleSaveMonster}
-          initialData={monsterToCopy || undefined}
+          initialData={monsterToEdit || monsterToCopy || undefined}
+          isEdit={!!monsterToEdit}
           error={error}
         />
       )}

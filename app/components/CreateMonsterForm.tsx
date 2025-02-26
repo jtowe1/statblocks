@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import type { Monster } from '../lib/monsters';
+import RichTextEditor from './RichTextEditor';
 
 interface CreateMonsterFormProps {
   onClose: () => void;
   onSave: (monster: Monster) => void;
   initialData?: Monster;
+  isEdit?: boolean;
   error?: string | null;
 }
 
-export default function CreateMonsterForm({ onClose, onSave, initialData, error }: CreateMonsterFormProps) {
+export default function CreateMonsterForm({ onClose, onSave, initialData, isEdit = false, error }: CreateMonsterFormProps) {
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
     meta: initialData?.meta || '',
@@ -31,10 +33,11 @@ export default function CreateMonsterForm({ onClose, onSave, initialData, error 
     Senses: initialData?.Senses || '',
     Languages: initialData?.Languages || '',
     Challenge: initialData?.Challenge || '',
-    Traits: initialData?.Traits || '',
-    Actions: initialData?.Actions || '',
     img_url: initialData?.img_url || ''
   });
+
+  const [traits, setTraits] = useState(initialData?.Traits || '');
+  const [actions, setActions] = useState(initialData?.Actions || '');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -53,9 +56,42 @@ export default function CreateMonsterForm({ onClose, onSave, initialData, error 
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSave(formData);
+    const formData = new FormData(e.currentTarget);
+
+    const monster: Monster = {
+      name: formData.get('name') as string,
+      meta: formData.get('meta') as string,
+      ArmorClass: formData.get('ArmorClass') as string,
+      HitPoints: formData.get('HitPoints') as string,
+      Speed: formData.get('Speed') as string,
+      STR: formData.get('STR') as string,
+      STR_mod: formData.get('STR_mod') as string,
+      DEX: formData.get('DEX') as string,
+      DEX_mod: formData.get('DEX_mod') as string,
+      CON: formData.get('CON') as string,
+      CON_mod: formData.get('CON_mod') as string,
+      INT: formData.get('INT') as string,
+      INT_mod: formData.get('INT_mod') as string,
+      WIS: formData.get('WIS') as string,
+      WIS_mod: formData.get('WIS_mod') as string,
+      CHA: formData.get('CHA') as string,
+      CHA_mod: formData.get('CHA_mod') as string,
+      Skills: formData.get('Skills') as string || undefined,
+      Senses: formData.get('Senses') as string || undefined,
+      Languages: formData.get('Languages') as string || undefined,
+      Challenge: formData.get('Challenge') as string,
+      Traits: traits || undefined,
+      Actions: actions || undefined,
+      img_url: formData.get('img_url') as string || undefined,
+    };
+
+    if (isEdit && initialData?.id) {
+      monster.id = initialData.id;
+    }
+
+    onSave(monster);
   };
 
   const abilities = [
@@ -70,7 +106,9 @@ export default function CreateMonsterForm({ onClose, onSave, initialData, error 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-amber-50 p-6 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl text-amber-900 font-serif mb-4">Create Monster</h2>
+        <h2 className="text-2xl text-amber-900 font-serif mb-4">
+          {isEdit ? 'Edit Monster' : 'Create Monster'}
+        </h2>
 
         {error && (
           <div className="mb-4 p-3 bg-red-100 border-2 border-red-700 text-red-700 rounded">
@@ -220,27 +258,17 @@ export default function CreateMonsterForm({ onClose, onSave, initialData, error 
             </div>
           </div>
 
-          <div>
-            <label className="block text-amber-900 mb-1">Traits</label>
-            <textarea
-              name="Traits"
-              value={formData.Traits}
-              onChange={handleChange}
-              placeholder="<p><em><strong>Aggressive.</strong></em> As a bonus action, the orc can move up to its speed toward a hostile creature that it can see.</p>"
-              className="w-full p-2 border-2 border-amber-900 rounded bg-amber-50 h-32"
-            />
-          </div>
+          <RichTextEditor
+            label="Traits"
+            initialValue={initialData?.Traits || ''}
+            onChange={setTraits}
+          />
 
-          <div>
-            <label className="block text-amber-900 mb-1">Actions</label>
-            <textarea
-              name="Actions"
-              value={formData.Actions}
-              onChange={handleChange}
-              placeholder="<p><em><strong>Greataxe.</strong></em> <em>Melee Weapon Attack:</em> +5 to hit, reach 5 ft., one target. <em>Hit:</em> 9 (1d12 + 3) slashing damage.</p><p><em><strong>Javelin.</strong></em> <em>Melee or Ranged Weapon Attack:</em> +5 to hit, reach 5 ft. or range 30/120 ft., one target. <em>Hit:</em> 6 (1d6 + 3) piercing damage.</p>"
-              className="w-full p-2 border-2 border-amber-900 rounded bg-amber-50 h-32"
-            />
-          </div>
+          <RichTextEditor
+            label="Actions"
+            initialValue={initialData?.Actions || ''}
+            onChange={setActions}
+          />
 
           <div>
             <label className="block text-amber-900 mb-1">Image URL</label>
@@ -266,7 +294,7 @@ export default function CreateMonsterForm({ onClose, onSave, initialData, error 
               type="submit"
               className="px-4 py-2 bg-amber-900 text-amber-50 rounded hover:bg-amber-800"
             >
-              Create Monster
+              {isEdit ? 'Update Monster' : 'Create Monster'}
             </button>
           </div>
         </form>
