@@ -3,7 +3,6 @@ import { useState } from "react";
 import Statblock from "./Statblock";
 import CreateMonsterForm from "./CreateMonsterForm";
 import type { Monster } from '../lib/monsters';
-import PrintModal from "./PrintModal";
 import CreateEncounterForm from "./CreateEncounterForm";
 import { Encounter } from '../lib/encounters';
 import AddToEncounterModal from './AddToEncounterModal';
@@ -18,7 +17,6 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
   const [searchTerm, setSearchTerm] = useState("");
   const [showImages, setShowImages] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showPrintModal, setShowPrintModal] = useState(false);
   const [monsterToCopy, setMonsterToCopy] = useState<Monster | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showCreateEncounter, setShowCreateEncounter] = useState(false);
@@ -340,13 +338,6 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
           initialData={monsterToEdit || monsterToCopy || undefined}
           isEdit={!!monsterToEdit}
           error={error}
-        />
-      )}
-
-      {showPrintModal && (
-        <PrintModal
-          monsters={monsters}
-          onClose={() => setShowPrintModal(false)}
         />
       )}
 
