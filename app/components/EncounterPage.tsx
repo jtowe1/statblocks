@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Monster } from '../lib/monsters';
 import { Encounter } from '../lib/encounters';
 import Link from 'next/link';
+import Statblock from './Statblock';
 
 interface EncounterPageProps {
   encounterId: number;
@@ -14,6 +15,7 @@ export default function EncounterPage({ encounterId }: EncounterPageProps) {
   const [monsters, setMonsters] = useState<Monster[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
 
   useEffect(() => {
     const fetchEncounter = async () => {
@@ -60,6 +62,14 @@ export default function EncounterPage({ encounterId }: EncounterPageProps) {
     }
   };
 
+  const handleShowStatblock = (monster: Monster) => {
+    setSelectedMonster(monster);
+  };
+
+  const handleCloseStatblock = () => {
+    setSelectedMonster(null);
+  };
+
   if (loading) return <div className="p-4">Loading encounter...</div>;
   if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
   if (!encounter) return <div className="p-4">Encounter not found</div>;
@@ -94,8 +104,13 @@ export default function EncounterPage({ encounterId }: EncounterPageProps) {
                 key={monster.encounter_monster_id}
                 className="flex justify-between items-center p-3 bg-amber-100 rounded hover:bg-amber-200"
               >
-                <div>
-                  <h3 className="font-bold text-amber-900">{monster.name}</h3>
+                <div className="flex-grow">
+                  <h3
+                    className="font-bold text-amber-900 cursor-pointer hover:underline"
+                    onClick={() => handleShowStatblock(monster)}
+                  >
+                    {monster.name}
+                  </h3>
                   <p className="text-sm text-amber-800">{monster.meta}</p>
                   <div className="flex space-x-4 text-sm mt-1">
                     <span>AC: {monster.ArmorClass}</span>
@@ -114,6 +129,30 @@ export default function EncounterPage({ encounterId }: EncounterPageProps) {
           </ul>
         )}
       </div>
+
+      {/* Statblock Modal */}
+      {selectedMonster && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="relative bg-amber-50 p-6 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={handleCloseStatblock}
+              className="absolute top-2 right-2 text-amber-900 hover:text-amber-700 text-xl"
+            >
+              ×
+            </button>
+            <Statblock
+              {...selectedMonster}
+              isInEncounter={true}
+              encounter_monster_id={selectedMonster.encounter_monster_id}
+              onRemoveFromEncounter={handleRemoveMonster}
+              onAddToEncounter={() => {}}
+              onCopy={() => {}}
+              onEdit={() => {}}
+              showImage={false}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
