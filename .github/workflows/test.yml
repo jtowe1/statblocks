@@ -47,14 +47,14 @@ jobs:
 
     - name: Initialize and seed database
       env:
-        DATABASE_URL: mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:3310/monsters
+        DATABASE_URL: mysql://test_user:test_password@localhost:3310/monsters
       run: |
         npx prisma db push --accept-data-loss
         npm run seed-db
 
     - name: Start Next.js app and run tests
       env:
-        DATABASE_URL: mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:3310/monsters
+        DATABASE_URL: mysql://test_user:test_password@localhost:3310/monsters
       run: |
         npm run dev &
         npx wait-on http://localhost:3000
