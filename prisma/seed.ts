@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import monsters from '../app/data/monsters-seed-data.json';
+import './seed-spells';
 
 const prisma = new PrismaClient();
 

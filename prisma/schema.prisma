@@ -64,3 +64,23 @@ model EncounterMonster {
 
   @@map("encounter_monsters")
 }
+
+model Spell {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @map("spell_name")
+  ritual      Boolean  @default(false)
+  school      String
+  tags        String?
+  level       Int
+  castingTime String   @map("casting_time")
+  range       String
+  components  String
+  duration    String
+  description String   @db.Text
+  classes     String
+  sourceBook  String   @map("source_book")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("spells")
+}
