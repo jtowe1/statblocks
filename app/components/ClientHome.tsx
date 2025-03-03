@@ -142,9 +142,9 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
     }
   };
 
-  const handleEncounterClick = async (encounter: Encounter) => {
-    setSelectedEncounter(encounter);
-    await fetchEncounterMonsters(encounter.id);
+  const handleEncounterClick = (encounter: Encounter) => {
+    // Navigate to the encounter page
+    window.location.href = `/encounter/${encounter.id}`;
   };
 
   const handleDeleteEncounter = async (encounterId: number, event: React.MouseEvent) => {
