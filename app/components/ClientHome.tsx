@@ -319,6 +319,7 @@ export default function ClientHome({ initialMonsters, initialEncounters }: Clien
                   onEdit={handleEditMonster}
                   showImages={showImages}
                   onAddToEncounter={handleAddToEncounter}
+                  isInEncounter={false}
                 />
               ))}
             </div>

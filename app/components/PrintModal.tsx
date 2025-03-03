@@ -36,6 +36,7 @@ export default function PrintModal({ monsters, onClose }: PrintModalProps) {
                 onCopy={() => {}}
                 showImages={true}
                 onAddToEncounter={() => {}}
+                isInEncounter={false}
               />
             </div>
           ))}

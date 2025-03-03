@@ -26,6 +26,7 @@ export interface Monster {
   Traits?: string | null;
   Actions?: string | null;
   img_url?: string | null;
+  encounter_monster_id?: number;
 }
 
 export async function getMonsters(): Promise<Monster[]> {

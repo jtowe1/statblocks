@@ -20,13 +20,13 @@ interface CreatureStats {
   WIS_mod: string;
   CHA: string;
   CHA_mod: string;
-  Skills?: string;
-  Senses?: string;
-  Languages?: string;
+  Skills?: string | null;
+  Senses?: string | null;
+  Languages?: string | null;
   Challenge: string;
-  Traits?: string;
-  Actions?: string;
-  img_url?: string;
+  Traits?: string | null;
+  Actions?: string | null;
+  img_url?: string | null;
 }
 
 interface StatBlockProps extends CreatureStats {
