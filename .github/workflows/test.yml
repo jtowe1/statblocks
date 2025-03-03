@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  MYSQL_DATABASE: monsters
+  MYSQL_USER: ${{ secrets.DB_USER }}
+  MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -20,7 +26,15 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
         ports:
           - 3310:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+          -e MYSQL_DATABASE=monsters
+          -e MYSQL_USER=${{ secrets.DB_USER }}
+          -e MYSQL_PASSWORD=${{ secrets.DB_PASSWORD }}
+          -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
 
     steps:
     - uses: actions/checkout@v4
