@@ -1,4 +1,4 @@
-import { openDb } from './db';
+import { prisma } from './prisma';
 
 export interface Encounter {
   id: number;
@@ -8,17 +8,16 @@ export interface Encounter {
 }
 
 export async function getEncounters(): Promise<Encounter[]> {
-  const db = await openDb();
-  try {
-    const result = await db.execute(`
-      SELECT id, name, created_at, updated_at
-      FROM encounters
-      ORDER BY created_at DESC
-    `);
-    return result.rows as Encounter[];
-  } finally {
-    await db.close();
-  }
+  const encounters = await prisma.encounter.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
+
+  return encounters.map(encounter => ({
+    id: encounter.id,
+    name: encounter.name,
+    created_at: encounter.createdAt,
+    updated_at: encounter.updatedAt
+  }));
 }
 
 export interface EncounterMonster {

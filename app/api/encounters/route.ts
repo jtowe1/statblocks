@@ -1,5 +1,20 @@
 import { NextResponse } from 'next/server';
-import { openDb } from '@/app/lib/db';
+import { prisma } from '@/app/lib/prisma';
+
+export async function GET() {
+  try {
+    const encounters = await prisma.encounter.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    return NextResponse.json(encounters);
+  } catch (error) {
+    console.error('Error fetching encounters:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch encounters' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -12,26 +27,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = await openDb();
+    const encounter = await prisma.encounter.create({
+      data: { name }
+    });
 
-    try {
-      const result = await db.execute(
-        'INSERT INTO encounters (name) VALUES (?)',
-        [name]
-      );
-
-      return NextResponse.json({
-        id: result.insertId,
-        name,
-        created_at: new Date(),
-        updated_at: new Date()
-      });
-    } catch (error: unknown) {
-      // Handle specific MySQL errors if needed
-      throw error;
-    } finally {
-      await db.close();
-    }
+    return NextResponse.json(encounter);
   } catch (error) {
     console.error('Error creating encounter:', error);
     return NextResponse.json(

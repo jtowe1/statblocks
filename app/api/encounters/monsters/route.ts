@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { openDb } from '@/app/lib/db';
+import { prisma } from '@/app/lib/prisma';
 
 interface RequestBody {
   encounterId: number;
@@ -17,44 +17,45 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = await openDb();
-
-    try {
-      // First verify that both the encounter and monster exist
-      const [encounterResult, monsterResult] = await Promise.all([
-        db.execute('SELECT id FROM encounters WHERE id = ?', [encounterId]),
-        db.execute('SELECT id FROM monsters WHERE id = ?', [monsterId])
-      ]);
-
-      if (!encounterResult.rows.length) {
-        return NextResponse.json(
-          { error: 'Encounter not found' },
-          { status: 404 }
-        );
+    const encounterMonster = await prisma.encounterMonster.create({
+      data: {
+        encounterId,
+        monsterId
+      },
+      include: {
+        monster: true
       }
+    });
 
-      if (!monsterResult.rows.length) {
-        return NextResponse.json(
-          { error: 'Monster not found' },
-          { status: 404 }
-        );
-      }
-
-      // Add the monster to the encounter
-      const result = await db.execute(
-        'INSERT INTO encounter_monsters (encounter_id, monster_id) VALUES (?, ?)',
-        [encounterId, monsterId]
-      );
-
-      return NextResponse.json({
-        id: result.insertId,
-        encounter_id: encounterId,
-        monster_id: monsterId,
-        created_at: new Date()
-      });
-    } finally {
-      await db.close();
-    }
+    const monster = encounterMonster.monster;
+    return NextResponse.json({
+      id: monster.id,
+      name: monster.name,
+      meta: monster.meta,
+      ArmorClass: monster.armorClass,
+      HitPoints: monster.hitPoints,
+      Speed: monster.speed,
+      STR: monster.str,
+      STR_mod: monster.strMod,
+      DEX: monster.dex,
+      DEX_mod: monster.dexMod,
+      CON: monster.con,
+      CON_mod: monster.conMod,
+      INT: monster.intelligence,
+      INT_mod: monster.intelligenceMod,
+      WIS: monster.wis,
+      WIS_mod: monster.wisMod,
+      CHA: monster.cha,
+      CHA_mod: monster.chaMod,
+      Skills: monster.skills,
+      Senses: monster.senses,
+      Languages: monster.languages,
+      Challenge: monster.challenge,
+      Traits: monster.traits,
+      Actions: monster.actions,
+      img_url: monster.imgUrl,
+      encounter_monster_id: encounterMonster.id
+    });
   } catch (error) {
     console.error('Error adding monster to encounter:', error);
     return NextResponse.json(

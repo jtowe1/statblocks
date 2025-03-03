@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Monster {
+  id               Int               @id @default(autoincrement())
+  name             String           @unique
+  meta             String           @db.Text
+  armorClass       String           @map("armor_class") @db.Text
+  hitPoints        String           @map("hit_points") @db.Text
+  speed            String           @db.Text
+  str              String           @db.Text
+  strMod           String           @map("str_mod") @db.Text
+  dex              String           @db.Text
+  dexMod           String           @map("dex_mod") @db.Text
+  con              String           @db.Text
+  conMod           String           @map("con_mod") @db.Text
+  intelligence     String           @db.Text
+  intelligenceMod  String           @map("intelligence_mod") @db.Text
+  wis              String           @db.Text
+  wisMod           String           @map("wis_mod") @db.Text
+  cha              String           @db.Text
+  chaMod           String           @map("cha_mod") @db.Text
+  skills           String?          @db.Text
+  senses           String?          @db.Text
+  languages        String?          @db.Text
+  challenge        String           @db.Text
+  traits           String?          @db.Text
+  actions          String?          @db.Text
+  imgUrl           String?          @map("img_url") @db.Text
+  encounters       EncounterMonster[]
+
+  @@map("monsters")
+}
+
+model Encounter {
+  id        Int               @id @default(autoincrement())
+  name      String
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  monsters  EncounterMonster[]
+
+  @@map("encounters")
+}
+
+model EncounterMonster {
+  id          Int       @id @default(autoincrement())
+  encounterId Int       @map("encounter_id")
+  monsterId   Int       @map("monster_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  encounter   Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  monster     Monster   @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+
+  @@map("encounter_monsters")
+}

@@ -1,78 +1,120 @@
 import { NextResponse } from 'next/server';
-import { openDb } from '@/app/lib/db';
+import { prisma } from '@/app/lib/prisma';
 import type { Monster } from '@/app/lib/monsters';
 
-interface MySQLError extends Error {
-  code?: string;
+export async function GET() {
+  try {
+    const monsters = await prisma.monster.findMany({
+      orderBy: {
+        name: 'asc'
+      }
+    });
+
+    // Transform the data to match your existing Monster interface
+    const transformedMonsters = monsters.map(monster => ({
+      id: monster.id,
+      name: monster.name,
+      meta: monster.meta,
+      ArmorClass: monster.armorClass,
+      HitPoints: monster.hitPoints,
+      Speed: monster.speed,
+      STR: monster.str,
+      STR_mod: monster.strMod,
+      DEX: monster.dex,
+      DEX_mod: monster.dexMod,
+      CON: monster.con,
+      CON_mod: monster.conMod,
+      INT: monster.intelligence,
+      INT_mod: monster.intelligenceMod,
+      WIS: monster.wis,
+      WIS_mod: monster.wisMod,
+      CHA: monster.cha,
+      CHA_mod: monster.chaMod,
+      Skills: monster.skills,
+      Senses: monster.senses,
+      Languages: monster.languages,
+      Challenge: monster.challenge,
+      Traits: monster.traits,
+      Actions: monster.actions,
+      img_url: monster.imgUrl
+    }));
+
+    return NextResponse.json(transformedMonsters);
+  } catch (error) {
+    console.error('Error fetching monsters:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch monsters' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
   try {
-    const monster = await request.json() as Monster;
-    const db = await openDb();
+    const monsterData: Monster = await request.json();
 
-    try {
-      const result = await db.execute(`
-        INSERT INTO monsters (
-          name, meta, armor_class, hit_points, speed,
-          str, str_mod, dex, dex_mod, con, con_mod,
-          intelligence, intelligence_mod, wis, wis_mod, cha, cha_mod,
-          skills, senses, languages, challenge,
-          traits, actions, img_url
-        ) VALUES (
-          ?, ?, ?, ?, ?,
-          ?, ?, ?, ?, ?, ?,
-          ?, ?, ?, ?, ?, ?,
-          ?, ?, ?, ?,
-          ?, ?, ?
-        )
-      `, [
-        monster.name,
-        monster.meta,
-        monster.ArmorClass,
-        monster.HitPoints,
-        monster.Speed,
-        monster.STR,
-        monster.STR_mod,
-        monster.DEX,
-        monster.DEX_mod,
-        monster.CON,
-        monster.CON_mod,
-        monster.INT,
-        monster.INT_mod,
-        monster.WIS,
-        monster.WIS_mod,
-        monster.CHA,
-        monster.CHA_mod,
-        monster.Skills || null,
-        monster.Senses || null,
-        monster.Languages || null,
-        monster.Challenge,
-        monster.Traits || null,
-        monster.Actions || null,
-        monster.img_url || null
-      ]);
-
-      return NextResponse.json({
-        ...monster,
-        id: result.insertId || null
-      });
-    } catch (error: unknown) {
-      // Type guard to check if error is MySQLError
-      if (error instanceof Error && (error as MySQLError).code === 'ER_DUP_ENTRY') {
-        return NextResponse.json(
-          { error: 'A monster with this name already exists' },
-          { status: 409 }
-        );
+    const monster = await prisma.monster.create({
+      data: {
+        name: monsterData.name,
+        meta: monsterData.meta,
+        armorClass: monsterData.ArmorClass,
+        hitPoints: monsterData.HitPoints,
+        speed: monsterData.Speed,
+        str: monsterData.STR,
+        strMod: monsterData.STR_mod,
+        dex: monsterData.DEX,
+        dexMod: monsterData.DEX_mod,
+        con: monsterData.CON,
+        conMod: monsterData.CON_mod,
+        intelligence: monsterData.INT,
+        intelligenceMod: monsterData.INT_mod,
+        wis: monsterData.WIS,
+        wisMod: monsterData.WIS_mod,
+        cha: monsterData.CHA,
+        chaMod: monsterData.CHA_mod,
+        skills: monsterData.Skills,
+        senses: monsterData.Senses,
+        languages: monsterData.Languages,
+        challenge: monsterData.Challenge,
+        traits: monsterData.Traits,
+        actions: monsterData.Actions,
+        imgUrl: monsterData.img_url
       }
-      throw error;
-    } finally {
-      await db.close();
-    }
+    });
+
+    const transformedMonster: Monster = {
+      id: monster.id,
+      name: monster.name,
+      meta: monster.meta,
+      ArmorClass: monster.armorClass,
+      HitPoints: monster.hitPoints,
+      Speed: monster.speed,
+      STR: monster.str,
+      STR_mod: monster.strMod,
+      DEX: monster.dex,
+      DEX_mod: monster.dexMod,
+      CON: monster.con,
+      CON_mod: monster.conMod,
+      INT: monster.intelligence,
+      INT_mod: monster.intelligenceMod,
+      WIS: monster.wis,
+      WIS_mod: monster.wisMod,
+      CHA: monster.cha,
+      CHA_mod: monster.chaMod,
+      Skills: monster.skills,
+      Senses: monster.senses,
+      Languages: monster.languages,
+      Challenge: monster.challenge,
+      Traits: monster.traits,
+      Actions: monster.actions,
+      img_url: monster.imgUrl
+    };
+
+    return NextResponse.json(transformedMonster);
   } catch (error) {
-    console.error('Error saving monster:', error);
+    console.error('Error creating monster:', error);
     return NextResponse.json(
-      { error: 'Failed to save monster' },
+      { error: 'Failed to create monster' },
       { status: 500 }
     );
   }

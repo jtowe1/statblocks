@@ -1,13 +1,85 @@
 import { NextResponse } from 'next/server';
-import { openDb } from '@/app/lib/db';
+import { prisma } from '@/app/lib/prisma';
+import { Monster } from '@/app/lib/monsters';
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const encounterId = parseInt(params.id);
+    const id = parseInt(params.id);
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: 'Invalid encounter ID' },
+        { status: 400 }
+      );
+    }
 
+    const monsters = await prisma.monster.findMany({
+      where: {
+        encounters: {
+          some: {
+            encounterId: id
+          }
+        }
+      },
+      include: {
+        encounters: {
+          where: {
+            encounterId: id
+          },
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    const transformedMonsters = monsters.map(monster => ({
+      id: monster.id,
+      name: monster.name,
+      meta: monster.meta,
+      ArmorClass: monster.armorClass,
+      HitPoints: monster.hitPoints,
+      Speed: monster.speed,
+      STR: monster.str,
+      STR_mod: monster.strMod,
+      DEX: monster.dex,
+      DEX_mod: monster.dexMod,
+      CON: monster.con,
+      CON_mod: monster.conMod,
+      INT: monster.intelligence,
+      INT_mod: monster.intelligenceMod,
+      WIS: monster.wis,
+      WIS_mod: monster.wisMod,
+      CHA: monster.cha,
+      CHA_mod: monster.chaMod,
+      Skills: monster.skills,
+      Senses: monster.senses,
+      Languages: monster.languages,
+      Challenge: monster.challenge,
+      Traits: monster.traits,
+      Actions: monster.actions,
+      img_url: monster.imgUrl,
+      encounter_monster_id: monster.encounters[0]?.id
+    }));
+
+    return NextResponse.json(transformedMonsters);
+  } catch (error) {
+    console.error('Error fetching monsters:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch monsters' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const encounterId = parseInt(params.id);
     if (isNaN(encounterId)) {
       return NextResponse.json(
         { error: 'Invalid encounter ID' },
@@ -15,58 +87,59 @@ export async function GET(
       );
     }
 
-    const db = await openDb();
-
-    try {
-      const result = await db.execute(`
-        SELECT
-          m.id,
-          m.name,
-          m.meta,
-          m.armor_class as ArmorClass,
-          m.hit_points as HitPoints,
-          m.speed as Speed,
-          m.str as STR,
-          m.str_mod as STR_mod,
-          m.dex as DEX,
-          m.dex_mod as DEX_mod,
-          m.con as CON,
-          m.con_mod as CON_mod,
-          m.intelligence,
-          m.intelligence_mod,
-          m.wis as WIS,
-          m.wis_mod as WIS_mod,
-          m.cha as CHA,
-          m.cha_mod as CHA_mod,
-          m.skills as Skills,
-          m.senses as Senses,
-          m.languages as Languages,
-          m.challenge as Challenge,
-          m.traits as Traits,
-          m.actions as Actions,
-          m.img_url,
-          em.id as encounter_monster_id
-        FROM monsters m
-        JOIN encounter_monsters em ON m.id = em.monster_id
-        WHERE em.encounter_id = ?
-        ORDER BY em.created_at ASC
-      `, [encounterId]);
-
-      // Transform the results to match the Monster interface
-      const monsters = result.rows.map(monster => ({
-        ...monster,
-        INT: monster.intelligence,
-        INT_mod: monster.intelligence_mod
-      }));
-
-      return NextResponse.json(monsters);
-    } finally {
-      await db.close();
+    const { monsterId } = await request.json();
+    if (!monsterId) {
+      return NextResponse.json(
+        { error: 'Monster ID is required' },
+        { status: 400 }
+      );
     }
+
+    const encounterMonster = await prisma.encounterMonster.create({
+      data: {
+        encounterId,
+        monsterId
+      },
+      include: {
+        monster: true
+      }
+    });
+
+    const monster = encounterMonster.monster;
+    const transformedMonster: Monster & { encounter_monster_id: number } = {
+      id: monster.id,
+      name: monster.name,
+      meta: monster.meta,
+      ArmorClass: monster.armorClass,
+      HitPoints: monster.hitPoints,
+      Speed: monster.speed,
+      STR: monster.str,
+      STR_mod: monster.strMod,
+      DEX: monster.dex,
+      DEX_mod: monster.dexMod,
+      CON: monster.con,
+      CON_mod: monster.conMod,
+      INT: monster.intelligence,
+      INT_mod: monster.intelligenceMod,
+      WIS: monster.wis,
+      WIS_mod: monster.wisMod,
+      CHA: monster.cha,
+      CHA_mod: monster.chaMod,
+      Skills: monster.skills,
+      Senses: monster.senses,
+      Languages: monster.languages,
+      Challenge: monster.challenge,
+      Traits: monster.traits,
+      Actions: monster.actions,
+      img_url: monster.imgUrl,
+      encounter_monster_id: encounterMonster.id
+    };
+
+    return NextResponse.json(transformedMonster);
   } catch (error) {
-    console.error('Error fetching encounter monsters:', error);
+    console.error('Error adding monster to encounter:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch encounter monsters' },
+      { error: 'Failed to add monster to encounter' },
       { status: 500 }
     );
   }

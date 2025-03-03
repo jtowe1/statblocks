@@ -1,32 +1,24 @@
 import { NextResponse } from 'next/server';
-import { openDb } from '@/app/lib/db';
+import { prisma } from '@/app/lib/prisma';
 
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const encounterMonsterId = parseInt(params.id);
-
-    if (isNaN(encounterMonsterId)) {
+    const id = parseInt(params.id);
+    if (isNaN(id)) {
       return NextResponse.json(
         { error: 'Invalid encounter monster ID' },
         { status: 400 }
       );
     }
 
-    const db = await openDb();
+    await prisma.encounterMonster.delete({
+      where: { id }
+    });
 
-    try {
-      await db.execute(
-        'DELETE FROM encounter_monsters WHERE id = ?',
-        [encounterMonsterId]
-      );
-
-      return NextResponse.json({ success: true });
-    } finally {
-      await db.close();
-    }
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error removing monster from encounter:', error);
     return NextResponse.json(

@@ -1,21 +1,18 @@
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
 
-# Install dependencies required for development
-RUN apk add --no-cache python3 make g++
+# Install OpenSSL for Prisma
+RUN apt-get update && apt-get install -y openssl
 
 # Copy package files
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install dependencies
+# Install dependencies and generate Prisma client
 RUN npm ci
+RUN npx prisma generate
 
-# Create data directory for any file-based storage needs
-RUN mkdir -p /app/app/data
+# Don't copy the rest of the files - they'll be mounted via volume
 
-# Switch to non-root user for better security
-USER node
-
-# Start the development server with hot reloading
 CMD ["npm", "run", "dev"]

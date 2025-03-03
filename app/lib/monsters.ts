@@ -1,4 +1,4 @@
-import { openDb } from './db';
+import { prisma } from './prisma';
 
 export interface Monster {
   id?: number;
@@ -19,55 +19,45 @@ export interface Monster {
   WIS_mod: string;
   CHA: string;
   CHA_mod: string;
-  Skills?: string;
-  Senses?: string;
-  Languages?: string;
+  Skills?: string | null;
+  Senses?: string | null;
+  Languages?: string | null;
   Challenge: string;
-  Traits?: string;
-  Actions?: string;
-  img_url?: string;
-  encounter_monster_id?: number;
+  Traits?: string | null;
+  Actions?: string | null;
+  img_url?: string | null;
 }
 
 export async function getMonsters(): Promise<Monster[]> {
-  const db = await openDb();
-  try {
-    const result = await db.execute(`
-      SELECT
-        id,
-        name,
-        meta,
-        armor_class as ArmorClass,
-        hit_points as HitPoints,
-        speed as Speed,
-        str as STR,
-        str_mod as STR_mod,
-        dex as DEX,
-        dex_mod as DEX_mod,
-        con as CON,
-        con_mod as CON_mod,
-        intelligence as \`INT\`,
-        intelligence_mod as \`INT_mod\`,
-        wis as WIS,
-        wis_mod as WIS_mod,
-        cha as CHA,
-        cha_mod as CHA_mod,
-        skills as Skills,
-        senses as Senses,
-        languages as Languages,
-        challenge as Challenge,
-        traits as Traits,
-        actions as Actions,
-        img_url
-      FROM monsters
-      ORDER BY name ASC
-    `);
+  const monsters = await prisma.monster.findMany({
+    orderBy: { name: 'asc' }
+  });
 
-    return result.rows as Monster[];
-  } catch (error) {
-    console.error('Error fetching monsters:', error);
-    throw error;
-  } finally {
-    await db.close();
-  }
+  return monsters.map(monster => ({
+    id: monster.id,
+    name: monster.name,
+    meta: monster.meta,
+    ArmorClass: monster.armorClass,
+    HitPoints: monster.hitPoints,
+    Speed: monster.speed,
+    STR: monster.str,
+    STR_mod: monster.strMod,
+    DEX: monster.dex,
+    DEX_mod: monster.dexMod,
+    CON: monster.con,
+    CON_mod: monster.conMod,
+    INT: monster.intelligence,
+    INT_mod: monster.intelligenceMod,
+    WIS: monster.wis,
+    WIS_mod: monster.wisMod,
+    CHA: monster.cha,
+    CHA_mod: monster.chaMod,
+    Skills: monster.skills,
+    Senses: monster.senses,
+    Languages: monster.languages,
+    Challenge: monster.challenge,
+    Traits: monster.traits,
+    Actions: monster.actions,
+    img_url: monster.imgUrl
+  }));
 }
